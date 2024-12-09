@@ -6,3 +6,7 @@ class CenterObject:
     @property
     def diameter(self):
         return self._diameter
+
+    @property
+    def mass(self):
+        return self._mass
