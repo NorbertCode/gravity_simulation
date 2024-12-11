@@ -10,7 +10,7 @@ Vector position (np.array) in meters, starting from top left (0, 0).
 Object mass in kilograms.
 
 ### _velocity
-Vector velocity (np.array) in ???
+Vector velocity (np.array) in m/s
 
 
 ## Methods
