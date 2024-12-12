@@ -2,7 +2,7 @@ import numpy as np
 
 
 class CenterObject:
-    def __init__(self, diameter: np.array, mass: float):
+    def __init__(self, diameter: float, mass: float):
         self._diameter = diameter
         self._mass = mass
 
