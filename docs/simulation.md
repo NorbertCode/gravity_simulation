@@ -33,6 +33,10 @@ Calculates the next position of the given point_object, based on its and the [_c
 
 Uses a parameter passed by the function instead of the class' property to allow for running the calculation without modifying the actual instance.
 
+### run_simulation_for_obj()
+#### run_simulation_for_obj(self, steps: int, point_object: PointObject) -> list[PointObject]:
+Creates an instance of [PointObject](./point_object.md) for each step of the simulation.
+
 ### draw()
 #### draw(self, center_object: CenterObject, point_objects: list[PointObject])
 Gets the final simulation results and creates their graphical representation.

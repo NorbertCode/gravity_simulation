@@ -3,11 +3,12 @@ from point_object import PointObject
 from center_object import CenterObject
 from math import sqrt
 from PIL import Image, ImageDraw
+from copy import deepcopy
 
 
 class Simulation:
     G_CONST = 6.67430e-11
-    TIME_STEP = 1e-7
+    TIME_STEP = 1e-3
 
     def __init__(self, resolution: tuple[int], meters_per_pixel,
                  center_object: CenterObject, point_objects: list[PointObject]):
@@ -20,7 +21,7 @@ class Simulation:
         self._center_obj.set_position(np.array(image_center) * self._meters_per_pixel)
 
     def calculate_next(self, point_object: PointObject) -> PointObject:
-        next_point = point_object  # So it creates a copy instead of changing the param
+        next_point = deepcopy(point_object)  # So it creates a copy instead of changing the param
 
         dist_vector = np.array([self._center_obj.position[0] - next_point.position[0],
                            self._center_obj.position[1] - next_point.position[1]])
@@ -35,6 +36,13 @@ class Simulation:
         next_point.update_position()
         return next_point
 
+    def run_simulation_for_obj(self, steps: int, point_object: PointObject) -> list[PointObject]:
+        point_obj_steps_list = [point_object]
+        for step in range(steps):
+            point_obj_steps_list.append(self.calculate_next(point_obj_steps_list[step]))
+        return point_obj_steps_list
+        # TODO: Maybe return list of positions instead of PointObjects?
+
     def draw(self, center_object: CenterObject, point_objects: list[PointObject]):
         output = Image.new("RGB", self._resolution)
         draw_output = ImageDraw.Draw(output)
@@ -45,16 +53,16 @@ class Simulation:
                            pixel_radius, fill=center_obj_fill_color)
 
         point_obj_fill_color = (0, 255, 0)
-        next_point_obj_fill_color = (255, 0, 0)
         for obj in point_objects:
-            obj_pos = obj.position / self._meters_per_pixel
-            draw_output.point(tuple(obj_pos), point_obj_fill_color)
-            next_obj_pos = self.calculate_next(obj).position / self._meters_per_pixel
-            draw_output.point(tuple(next_obj_pos), next_point_obj_fill_color)
+            obj_simulation = self.run_simulation_for_obj(2000, obj)
+            for sim_step in obj_simulation:
+                position = sim_step.position / self._meters_per_pixel
+                draw_output.point(tuple(position), point_obj_fill_color)
 
         output.show()
 
 
-test_objs = [PointObject(np.array([200., 200.]), 7.348e22, np.array([100, 0]))]
-sim = Simulation((128, 128), 10, CenterObject(100, 5.972e24), test_objs)
+# 4004 as meters per pixel so the distance from earth to the moon is 96 pixels
+test_objs = [PointObject(np.array([128 * 4004., 32 * 4004.]), 7.348e22, np.array([1022, 0]))]
+sim = Simulation((256, 256), 4004, CenterObject(100000, 5.972e24), test_objs)
 sim.draw(sim._center_obj, sim._point_objs)
