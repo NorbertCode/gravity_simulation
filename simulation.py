@@ -8,7 +8,7 @@ from copy import deepcopy
 
 class Simulation:
     G_CONST = 6.67430e-11
-    TIME_STEP = 1e-3
+    TIME_STEP = 1
 
     def __init__(self, resolution: tuple[int], meters_per_pixel,
                  center_object: CenterObject, point_objects: list[PointObject]):
@@ -54,7 +54,7 @@ class Simulation:
 
         point_obj_fill_color = (0, 255, 0)
         for obj in point_objects:
-            obj_simulation = self.run_simulation_for_obj(2000, obj)
+            obj_simulation = self.run_simulation_for_obj(3000, obj)
             for sim_step in obj_simulation:
                 position = sim_step.position / self._meters_per_pixel
                 draw_output.point(tuple(position), point_obj_fill_color)
@@ -62,7 +62,7 @@ class Simulation:
         output.show()
 
 
-# 4004 as meters per pixel so the distance from earth to the moon is 96 pixels
-test_objs = [PointObject(np.array([128 * 4004., 32 * 4004.]), 7.348e22, np.array([1022, 0]))]
-sim = Simulation((256, 256), 4004, CenterObject(100000, 5.972e24), test_objs)
+# 55000 as meters per pixel so the image spans 7000000 pixels in each direction
+test_objs = [PointObject(np.array([128 * 55000., (128 * 55000) - 6771000.]), 1000, np.array([7672, 0]))]
+sim = Simulation((256, 256), 55000, CenterObject(6731000., 5.972e24), test_objs)
 sim.draw(sim._center_obj, sim._point_objs)
