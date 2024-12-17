@@ -22,5 +22,5 @@ class PointObject:
     def set_velocity(self, velocity: np.array):
         self._velocity = velocity
 
-    def update_position(self):
-        self._position += self._velocity
+    def update_position(self, time_step):
+        self._position += self._velocity * time_step

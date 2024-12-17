@@ -32,8 +32,8 @@ class Simulation:
         force_vector = force * dist_norm
         accel_vector = force_vector / next_point.mass
 
+        next_point.update_position(self.TIME_STEP)
         next_point.set_velocity(next_point.velocity + (accel_vector * self.TIME_STEP))
-        next_point.update_position()
         return next_point
 
     def run_simulation_for_obj(self, steps: int, point_object: PointObject) -> list[PointObject]:
