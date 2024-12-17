@@ -6,7 +6,7 @@ Overall logic and physics simulation. Creates and manages objects, calculates th
 ### static G_CONST
 A physical constant used for gravity calculations.
 
-### TIME_STEP
+### static TIME_STEP
 Time step between each time [calculate_next()](#calculate_next) is called. A smaller value will lead to more detail, but higher number of steps needed
 
 ### _resolution
@@ -31,7 +31,9 @@ Sets inner variables to given values and calculates the output image's center, w
 #### calculate_next(self, point_object: PointObject) -> PointObject
 Calculates the next position of the given point_object, based on its and the [_center_obj](#_center_obj)'s properites.
 
-Uses a parameter passed by the function instead of the class' property to allow for running the calculation without modifying the actual instance.
+Uses a parameter passed by the function instead of the class' property to allow for running the calculation without modifying the actual instance and storing all steps of the simulation.
+
+All the calculations visible [here](https://www.desmos.com/calculator/jwtleflsny)
 
 ### run_simulation_for_obj()
 #### run_simulation_for_obj(self, steps: int, point_object: PointObject) -> list[PointObject]:
