@@ -97,6 +97,6 @@ class Simulation:
 # 55000 as meters per pixel so the image spans 7000000 pixels in each direction
 sim = Simulation((256, 256), 55000)
 with open("save.json", "r") as file:
-    sim.load_from_json(json.load(file))
+    sim.init_from_json(json.load(file))
 sim.draw(sim._center_obj, sim._point_objs)
-sim.save_as_json(sim._center_obj, sim._point_objs)
+# sim.save_as_json(sim._center_obj, sim._point_objs)
