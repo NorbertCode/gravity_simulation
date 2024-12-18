@@ -24,8 +24,17 @@ List of all instances of [PointObject](./point_object.md) used in the simulation
 
 ## Methods
 ### Constructor
-#### __init__(self, resolution: tuple[int], meters_per_pixel, center_object: CenterObject, point_objects: list[PointObject])
-Sets inner variables to given values and calculates the output image's center, which is then passed to [_center_obj](#_center_obj).
+#### __init__(self, resolution: tuple[int], meters_per_pixel)
+Sets inner variables to given values. Loading simulation objects is not handled here, because there are multiple ways of getting them. Look: [init_objects()](#init_objects) and [init_from_json()](#init_from_json).
+and calculates the output image's center, which is then passed to [_center_obj](#_center_obj).
+
+### init_objects()
+#### init_objects(self, center_obj: CenterObject, point_objs: list[PointObject])
+Load simulation objects from arguments.
+
+### init_from_json()
+#### init_from_json(self, data)
+Load simulation objects from file.
 
 ### calculate_next()
 #### calculate_next(self, point_object: PointObject) -> PointObject
