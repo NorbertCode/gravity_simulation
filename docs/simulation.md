@@ -36,17 +36,19 @@ Load simulation objects from arguments.
 #### init_from_json(self, data)
 Load simulation objects from file.
 
-### calculate_next()
-#### calculate_next(self, point_object: PointObject) -> PointObject
-Calculates the next position of the given point_object, based on its and the [_center_obj](#_center_obj)'s properites.
+### save_as_json()
+#### save_as_json(self, center_obj: CenterObjectm point_objs: list[PointObject])
+Save the end state of the simulation as json.
 
-Uses a parameter passed by the function instead of the class' property to allow for running the calculation without modifying the actual instance and storing all steps of the simulation.
+### calculate_next()
+#### calculate_next(self, point_obj: PointObject) -> PointObject
+Calculates the next position of the given point_object, based on its and the [_center_obj](#_center_obj)'s properites.
 
 All the calculations visible [here](https://www.desmos.com/calculator/jwtleflsny)
 
 ### run_simulation_for_obj()
 #### run_simulation_for_obj(self, steps: int, point_object: PointObject) -> list[PointObject]:
-Creates an instance of [PointObject](./point_object.md) for each step of the simulation.
+Creates a list of positions, each representing a step of the simulation. Modifies the given point object.
 
 ### draw()
 #### draw(self, center_object: CenterObject, point_objects: list[PointObject])

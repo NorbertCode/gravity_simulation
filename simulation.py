@@ -1,10 +1,13 @@
+# ruff: noqa: PTH123
+# @TODO: remove this later
+
 import json
 import numpy as np
 from point_object import PointObject
 from center_object import CenterObject
 from math import sqrt
 from PIL import Image, ImageDraw
-from copy import deepcopy
+from copy import copy
 
 
 class Simulation:
@@ -52,27 +55,25 @@ class Simulation:
         with open("save.json", "w") as file:
             json.dump(data, file, indent=4)
 
-    def calculate_next(self, point_object: PointObject) -> PointObject:
-        next_point = deepcopy(point_object)  # Create copy instead of modifying param
-
-        dist_vector = np.array([self._center_obj.position[0] - next_point.position[0],
-                           self._center_obj.position[1] - next_point.position[1]])
+    def calculate_next(self, point_obj: PointObject) -> PointObject:
+        dist_vector = np.array([self._center_obj.position[0] - point_obj.position[0],
+                                self._center_obj.position[1] - point_obj.position[1]])
         dist = sqrt(dist_vector[0]**2 + dist_vector[1]**2)
         dist_norm = dist_vector / dist
 
-        force = (self._center_obj.mass * next_point.mass * self.G_CONST) / (dist**2)
+        force = (self._center_obj.mass * point_obj.mass * self.G_CONST) / (dist**2)
         force_vector = force * dist_norm
-        accel_vector = force_vector / next_point.mass
+        accel_vector = force_vector / point_obj.mass
 
-        next_point.update_position(self.TIME_STEP)
-        next_point.set_velocity(next_point.velocity + (accel_vector * self.TIME_STEP))
-        return next_point
+        point_obj.update_position(self.TIME_STEP)
+        point_obj.set_velocity(point_obj.velocity + (accel_vector * self.TIME_STEP))
+        return copy(point_obj.position)
 
     def run_simulation_for_obj(self, steps: int,
                                point_object: PointObject) -> list[PointObject]:
-        point_obj_steps_list = [point_object]
-        for step in range(steps):
-            point_obj_steps_list.append(self.calculate_next(point_obj_steps_list[step]))
+        point_obj_steps_list = [point_object.position]
+        for _ in range(steps):
+            point_obj_steps_list.append(self.calculate_next(point_object))
         return point_obj_steps_list
 
     def draw(self, center_object: CenterObject, point_objects: list[PointObject]):
@@ -87,8 +88,8 @@ class Simulation:
         point_obj_fill_color = (0, 255, 0)
         for obj in point_objects:
             obj_simulation = self.run_simulation_for_obj(3000, obj)
-            for sim_step in obj_simulation:
-                position = sim_step.position / self._meters_per_pixel
+            for pos_per_step in obj_simulation:
+                position = pos_per_step / self._meters_per_pixel
                 draw_output.point(tuple(position), point_obj_fill_color)
 
         output.show()
