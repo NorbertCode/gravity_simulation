@@ -1,11 +1,7 @@
 {
     "center_object": {
         "diameter": 6731000.0,
-        "mass": 5.972e+24,
-        "position": [
-            7040000.0,
-            7040000.0
-        ]
+        "mass": 5.972e+24
     },
     "point_objects": [
         {

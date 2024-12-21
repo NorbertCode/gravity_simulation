@@ -27,7 +27,7 @@ class Simulation:
 
     def init_from_json(self, data):
         center_obj = CenterObject(data["center_object"]["diameter"],
-                                        data["center_object"]["mass"])
+                                  data["center_object"]["mass"])
         point_objs = [
             PointObject(np.array(obj["position"]),
                         obj["mass"],
@@ -36,12 +36,12 @@ class Simulation:
         ]
         self.init_objects(center_obj, point_objs)
 
-    def save_as_json(self, center_obj: CenterObject, point_objs: list[PointObject]):
+    def save_as_json(self, path: str, center_obj: CenterObject,
+                     point_objs: list[PointObject]):
         data = {
             "center_object": {
                 "diameter": center_obj.diameter,
-                "mass": center_obj.mass,
-                "position": center_obj.position.tolist()
+                "mass": center_obj.mass
             },
             "point_objects": [
                 {
@@ -52,7 +52,7 @@ class Simulation:
                 for obj in point_objs
             ]
         }
-        with open("save.json", "w") as file:
+        with open(path, "w") as file:
             json.dump(data, file, indent=4)
 
     def calculate_next(self, point_obj: PointObject) -> PointObject:
@@ -88,8 +88,8 @@ class Simulation:
         point_obj_fill_color = (0, 255, 0)
         for obj in point_objects:
             obj_simulation = self.run_simulation_for_obj(3000, obj)
-            for pos_per_step in obj_simulation:
-                position = pos_per_step / self._meters_per_pixel
+            for position_at_step in obj_simulation:
+                position = position_at_step / self._meters_per_pixel
                 draw_output.point(tuple(position), point_obj_fill_color)
 
         output.show()
