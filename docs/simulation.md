@@ -37,7 +37,7 @@ Load simulation objects from arguments.
 Load simulation objects from file.
 
 ### save_as_json()
-#### save_as_json(self, center_obj: CenterObjectm point_objs: list[PointObject])
+#### save_as_json(self, path: str, center_obj: CenterObjectm point_objs: list[PointObject])
 Save the end state of the simulation as json.
 
 ### calculate_next()
