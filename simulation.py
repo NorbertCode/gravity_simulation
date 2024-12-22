@@ -56,9 +56,8 @@ class Simulation:
             json.dump(data, file, indent=4)
 
     def calculate_next(self, point_obj: PointObject) -> PointObject:
-        dist_vector = np.array([self._center_obj.position[0] - point_obj.position[0],
-                                self._center_obj.position[1] - point_obj.position[1]])
-        dist = sqrt(dist_vector[0]**2 + dist_vector[1]**2)
+        dist_vector = self._center_obj.position - point_obj.position
+        dist = np.linalg.norm(dist_vector)
         dist_norm = dist_vector / dist
 
         force = (self._center_obj.mass * point_obj.mass * self.G_CONST) / (dist**2)
@@ -69,12 +68,31 @@ class Simulation:
         point_obj.set_velocity(point_obj.velocity + (accel_vector * self.TIME_STEP))
         return copy(point_obj.position)
 
-    def run_simulation_for_obj(self, steps: int,
-                               point_object: PointObject) -> list[PointObject]:
-        point_obj_steps_list = [point_object.position]
+    def run(self, steps: int) -> list[list[np.array]]:
+        # @TODO: this allows for multiple objects to start at the same position
+        # @TODO: does blacklist get duplicates?
+        positions_at_steps = [[copy(obj.position) for obj in self._point_objs]]
+        blacklist = []
         for _ in range(steps):
-            point_obj_steps_list.append(self.calculate_next(point_object))
-        return point_obj_steps_list
+            positions_at_step = [np.array([np.nan, np.nan])] * len(self._point_objs)
+            for index in range(len(self._point_objs)):
+                if index not in blacklist:
+                    position = self.calculate_next(self._point_objs[index])
+                    dist_to_center = np.linalg.norm(self._center_obj.position - position)
+                    # @TODO: should this use pixel or space coordinates?
+                    if dist_to_center > self._center_obj.diameter / 2:
+                        positions_at_step[index] = ((position / self._meters_per_pixel).round())
+                    else:
+                        blacklist.append(index)
+
+            # @TODO: this has to be reworked to support checking which objects collided
+            _, inverse, count = np.unique(positions_at_step, return_inverse=True,
+                                          return_counts=True, axis=0)
+            duplicate_indexes = np.where(count[inverse] > 1)[0]
+            blacklist.extend(duplicate_indexes)
+
+            positions_at_steps.append(positions_at_step)
+        return positions_at_steps
 
     def draw(self, center_object: CenterObject, point_objects: list[PointObject]):
         output = Image.new("RGB", self._resolution)
@@ -86,11 +104,11 @@ class Simulation:
                            pixel_radius, fill=center_obj_fill_color)
 
         point_obj_fill_color = (0, 255, 0)
-        for obj in point_objects:
-            obj_simulation = self.run_simulation_for_obj(3000, obj)
-            for position_at_step in obj_simulation:
-                position = position_at_step / self._meters_per_pixel
-                draw_output.point(tuple(position), point_obj_fill_color)
+        sim_data = self.run(3000)
+        for step in sim_data:
+            for obj_pos in step:
+                if obj_pos is not np.nan:
+                    draw_output.point(tuple(obj_pos), point_obj_fill_color)
 
         output.show()
 
