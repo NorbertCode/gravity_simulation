@@ -67,32 +67,33 @@ class Simulation:
         point_obj.set_velocity(point_obj.velocity + (accel_vector * self.TIME_STEP))
         return copy(point_obj.position)
 
-    def run(self, steps: int) -> tuple[list[list[np.array]], list[tuple[int, list[int]]]]:
-        positions_at_steps = [[(obj.position / self._meters_per_pixel).round()
-                                for obj in self._point_objs]]
+    def run(self, steps: int) -> tuple[list[list[np.array]],
+                                       list[tuple[int, list[int]]]]:
+        sim_steps = [[(obj.position / self._meters_per_pixel).round()
+                       for obj in self._point_objs]]
         collisions = []
         blacklist = []
         for step in range(steps):
-            positions_at_step = [np.array([np.nan, np.nan])] * len(self._point_objs)
+            positions = [np.array([np.nan, np.nan])] * len(self._point_objs)
             for index in range(len(self._point_objs)):
                 if index not in blacklist:
                     pos = self.calculate_next(self._point_objs[index])
                     dist_to_center = np.linalg.norm(self._center_obj.position - pos)
                     if dist_to_center > self._center_obj.diameter / 2:
-                        positions_at_step[index] = ((pos / self._meters_per_pixel).round())
+                        positions[index] = (pos / self._meters_per_pixel).round()
                     else:
                         collisions.append((step, [index]))
                         blacklist.append(index)
 
-            _, inverse, count = np.unique(positions_at_step, return_inverse=True,
+            _, inverse, count = np.unique(positions, return_inverse=True,
                                           return_counts=True, axis=0)
             duplicate_indexes = np.where(count[inverse] > 1)[0]
             if len(duplicate_indexes) > 0:
                 collisions.append((step, duplicate_indexes))
             blacklist.extend(duplicate_indexes)
 
-            positions_at_steps.append(positions_at_step)
-        return positions_at_steps, collisions
+            sim_steps.append(positions)
+        return sim_steps, collisions
 
     def draw(self, center_object: CenterObject, point_objects: list[PointObject]):
         output = Image.new("RGB", self._resolution)
