@@ -95,22 +95,27 @@ class Simulation:
             sim_steps.append(positions)
         return sim_steps, collisions
 
-    def draw(self, center_object: CenterObject, point_objects: list[PointObject]):
+    def draw(self, simulation_steps: list[list[np.array]]):
         output = Image.new("RGB", self._resolution)
         draw_output = ImageDraw.Draw(output)
 
-        pixel_radius = (center_object.diameter / 2) / self._meters_per_pixel
+        # @TODO: move this somewhere else
         center_obj_fill_color = (255, 255, 255)
-        draw_output.circle(center_object.position / self._meters_per_pixel,
-                           pixel_radius, fill=center_obj_fill_color)
-
         point_obj_fill_color = (0, 255, 0)
-        positions, collisions = self.run(3000)
-        print(collisions)
-        for step in positions:
+        point_obj_end_color = (255, 0, 0)
+
+        pixel_radius = round((self._center_obj.diameter / 2) / self._meters_per_pixel)
+        pixel_pos = (self._center_obj.position / self._meters_per_pixel).round()
+        draw_output.circle(pixel_pos, pixel_radius, fill=center_obj_fill_color)
+
+        for step in simulation_steps:
             for obj_pos in step:
                 if obj_pos is not np.nan:
                     draw_output.point(tuple(obj_pos), point_obj_fill_color)
+
+        for obj in self._point_objs:
+            pos = (obj.position / self._meters_per_pixel).round()
+            draw_output.point(tuple(pos), point_obj_end_color)
 
         output.show()
 
@@ -119,5 +124,7 @@ class Simulation:
 sim = Simulation((256, 256), 55000)
 with open("test.json", "r") as file:
     sim.init_from_json(json.load(file))
-sim.draw(sim._center_obj, sim._point_objs)
+output = sim.run(3000)
+sim.draw(output[0])
+print(output[1])
 # sim.save_as_json(sim._center_obj, sim._point_objs)

@@ -53,5 +53,5 @@ Returns a list of point objects' position per each step (for example the positio
 It iterates through the steps and for each of them check if any of the objects collided with the center object or each other.
 
 ### draw()
-#### draw(self, center_object: CenterObject, point_objects: list[PointObject])
+#### draw(self, simulation_steps: list[list[np.array]])
 Gets the final simulation results and creates their graphical representation.
