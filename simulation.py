@@ -5,7 +5,6 @@ import json
 import numpy as np
 from point_object import PointObject
 from center_object import CenterObject
-from math import sqrt
 from PIL import Image, ImageDraw
 from copy import copy
 
@@ -69,9 +68,8 @@ class Simulation:
         return copy(point_obj.position)
 
     def run(self, steps: int) -> list[list[np.array]]:
-        # @TODO: this allows for multiple objects to start at the same position
         # @TODO: does blacklist get duplicates?
-        positions_at_steps = [[copy(obj.position) for obj in self._point_objs]]
+        positions_at_steps = [[(obj.position / self._meters_per_pixel).round() for obj in self._point_objs]]
         blacklist = []
         for _ in range(steps):
             positions_at_step = [np.array([np.nan, np.nan])] * len(self._point_objs)
@@ -79,13 +77,11 @@ class Simulation:
                 if index not in blacklist:
                     position = self.calculate_next(self._point_objs[index])
                     dist_to_center = np.linalg.norm(self._center_obj.position - position)
-                    # @TODO: should this use pixel or space coordinates?
                     if dist_to_center > self._center_obj.diameter / 2:
                         positions_at_step[index] = ((position / self._meters_per_pixel).round())
                     else:
                         blacklist.append(index)
 
-            # @TODO: this has to be reworked to support checking which objects collided
             _, inverse, count = np.unique(positions_at_step, return_inverse=True,
                                           return_counts=True, axis=0)
             duplicate_indexes = np.where(count[inverse] > 1)[0]
@@ -115,7 +111,7 @@ class Simulation:
 
 # 55000 as meters per pixel so the image spans 7000000 pixels in each direction
 sim = Simulation((256, 256), 55000)
-with open("save.json", "r") as file:
+with open("test.json", "r") as file:
     sim.init_from_json(json.load(file))
 sim.draw(sim._center_obj, sim._point_objs)
 # sim.save_as_json(sim._center_obj, sim._point_objs)
