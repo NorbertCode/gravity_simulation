@@ -47,8 +47,8 @@ Calculates the next position of the given point_object, based on its and the [_c
 All the calculations visible [here](https://www.desmos.com/calculator/jwtleflsny)
 
 ### run()
-#### run(self, steps: int) -> list[list[np.array]]
-Returns a list of point objects' position per each step, for example the position of the first object at the last step would be positions_at_steps[-1][0].
+#### run(self, steps: int) -> tuple[list[list[np.array]], list[tuple[int, list[int]]]]
+Returns a list of point objects' position per each step (for example the position of the first object at the last step would be positions_at_steps[-1][0]) and a list of tuples which indicate the step at which a collision has occured an indexes of the collided elements.
 
 It iterates through the steps and for each of them check if any of the objects collided with the center object or each other.
 
