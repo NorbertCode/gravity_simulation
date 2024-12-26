@@ -1,6 +1,3 @@
-# ruff: noqa: PTH123
-# @TODO: remove this later
-
 import json
 import numpy as np
 from point_object import PointObject
@@ -118,13 +115,3 @@ class Simulation:
             draw_output.point(tuple(pos), point_obj_end_color)
 
         output.show()
-
-
-# 55000 as meters per pixel so the image spans 7000000 pixels in each direction
-sim = Simulation((256, 256), 55000)
-with open("test.json", "r") as file:
-    sim.init_from_json(json.load(file))
-output = sim.run(3000)
-sim.draw(output[0])
-print(output[1])
-# sim.save_as_json(sim._center_obj, sim._point_objs)
