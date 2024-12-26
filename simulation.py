@@ -92,7 +92,7 @@ class Simulation:
             sim_steps.append(positions)
         return sim_steps, collisions
 
-    def draw(self, simulation_steps: list[list[np.array]]):
+    def draw(self, simulation_steps: list[list[np.array]], file_name: str = None):
         output = Image.new("RGB", self._resolution)
         draw_output = ImageDraw.Draw(output)
 
@@ -114,4 +114,24 @@ class Simulation:
             pos = (obj.position / self._meters_per_pixel).round()
             draw_output.point(tuple(pos), point_obj_end_color)
 
+        if file_name is not None:
+            output.save(f"{file_name}.png")
         output.show()
+
+    @staticmethod
+    def generate_collision_report(collision_data, file_name: str = None) -> str:
+        output = ""
+        for collision in collision_data:
+            if len(collision[1]) > 1:
+                objects = ""
+                for obj in collision[1]:
+                    objects += f"n={obj}, "
+                output += f"Objects {objects[:-2]} collided at k={collision[0]}\n"
+            else:
+                output += f"Object n={collision[1][0]} collided at k={collision[0]}\n"
+
+        if file_name is not None:
+            with open(f"{file_name}.txt", "w") as file:
+                file.write(output)
+
+        return output
