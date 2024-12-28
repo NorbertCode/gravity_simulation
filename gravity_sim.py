@@ -32,14 +32,14 @@ elif args.interactive:
     point_objs = []
     n = int(input("Amount of point objects: "))
     for i in range(n):
-        point_pos_x = float(input(f"{i} Point object's x position in meters: "))
-        point_pos_y = float(input(f"{i} Point object's y position in meters: "))
+        point_pos_x = float(input(f"n={i} Point object's x position in meters: "))
+        point_pos_y = float(input(f"n={i} Point object's y position in meters: "))
         point_pos = np.array([point_pos_x, point_pos_y])
 
-        point_mass = float(input(f"{i} Point object's mass in kilograms: "))
+        point_mass = float(input(f"n={i} Point object's mass in kilograms: "))
 
-        point_vel_x = float(input(f"{i} Point object's x velocity in m/s: "))
-        point_vel_y = float(input(f"{i} Point object's y velocity in m/s: "))
+        point_vel_x = float(input(f"n={i} Point object's x velocity in m/s: "))
+        point_vel_y = float(input(f"n={i} Point object's y velocity in m/s: "))
         point_vel = np.array([point_vel_x, point_vel_y])
 
         point_objs.append(PointObject(point_pos, point_mass, point_vel))
