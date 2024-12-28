@@ -10,16 +10,13 @@ class Simulation:
     G_CONST = 6.67430e-11
     TIME_STEP = 1
 
-    def __init__(self, resolution: tuple[int], meters_per_pixel):
+    def __init__(self, resolution: tuple[int, int], meters_per_pixel):
         self._resolution = resolution
         self._meters_per_pixel = meters_per_pixel
 
     def init_objects(self, center_obj: CenterObject, point_objs: list[PointObject]):
         self._center_obj = center_obj
         self._point_objs = point_objs
-
-        image_center = [self._resolution[0] / 2, self._resolution[1] / 2]
-        self._center_obj.set_position(np.array(image_center) * self._meters_per_pixel)
 
     def init_from_json(self, data):
         center_obj = CenterObject(data["center_object"]["diameter"],
@@ -102,16 +99,20 @@ class Simulation:
         point_obj_end_color = (255, 0, 0)
 
         pixel_radius = round((self._center_obj.diameter / 2) / self._meters_per_pixel)
-        pixel_pos = (self._center_obj.position / self._meters_per_pixel).round()
-        draw_output.circle(pixel_pos, pixel_radius, fill=center_obj_fill_color)
+        img_center = [round(self._resolution[0] / 2), round(self._resolution[1] / 2)]
+        draw_output.circle(img_center, pixel_radius, fill=center_obj_fill_color)
 
         for step in simulation_steps:
             for obj_pos in step:
                 if obj_pos is not np.nan:
-                    draw_output.point(tuple(obj_pos), point_obj_fill_color)
+                    obj_pos[1] *= -1  # Y axis has to be inverted
+                    # This is because on the image it rises the lower it goes, which
+                    # is the opposite of how it works in 2D geometry
+                    draw_output.point(tuple(img_center + obj_pos), point_obj_fill_color)
 
         for obj in self._point_objs:
-            pos = (obj.position / self._meters_per_pixel).round()
+            obj_pos = obj.position * np.array([1, -1])  # Invert Y axis
+            pos = img_center + (obj_pos / self._meters_per_pixel).round()
             draw_output.point(tuple(pos), point_obj_end_color)
 
         if file_name is not None:

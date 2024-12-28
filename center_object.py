@@ -6,7 +6,7 @@ class CenterObject:
         self._diameter = diameter
         self._mass = mass
 
-        self._position = None
+        self._position = np.array([0, 0])
 
     @property
     def diameter(self):
@@ -19,6 +19,3 @@ class CenterObject:
     @property
     def position(self):
         return self._position
-
-    def set_position(self, position: np.array):
-        self._position = position
