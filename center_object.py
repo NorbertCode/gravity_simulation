@@ -1,21 +1,12 @@
+from space_object import SpaceObject
 import numpy as np
 
 
-class CenterObject:
+class CenterObject(SpaceObject):
     def __init__(self, diameter: float, mass: float):
+        super().__init__(np.array([0, 0]), mass)
         self._diameter = diameter
-        self._mass = mass
-
-        self._position = np.array([0, 0])
 
     @property
     def diameter(self):
         return self._diameter
-
-    @property
-    def mass(self):
-        return self._mass
-
-    @property
-    def position(self):
-        return self._position
