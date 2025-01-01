@@ -1,7 +1,7 @@
 import argparse
 import json
-import simulation
 import numpy as np
+from simulation import Simulation
 from center_object import CenterObject
 from point_object import PointObject
 from datetime import datetime
@@ -21,7 +21,7 @@ input_group.add_argument("-i", "--interactive", action="store_true",
                          help="input values manually")
 args = parser.parse_args()
 
-sim = simulation.Simulation(args.resolution, args.meters_per_pixel)
+sim = Simulation(args.resolution, args.meters_per_pixel)
 if args.file:
     with open(args.file[0], "r") as file:
         sim.init_from_json(json.load(file))
