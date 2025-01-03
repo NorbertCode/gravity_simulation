@@ -54,9 +54,16 @@ elif args.interactive:
     sim.init_objects(center_obj, point_objs)
 
 output = sim.run(args.k)
+output_img = sim.draw(output[0])
+output_col = sim.generate_collision_report(output[1])
 
-file_name = None
+if not args.quiet:
+    print(output_col)
+    output_img.show()
+
 if args.save:
     file_name = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
-print(sim.generate_collision_report(output[1], file_name))
-sim.draw(output[0], file_name)
+    output_img.save(f"{file_name}.png")
+
+    with open(f"{file_name}.txt", "w") as file:
+        file.write(output_col)
