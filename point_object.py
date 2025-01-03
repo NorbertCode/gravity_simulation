@@ -3,9 +3,13 @@ import numpy as np
 
 
 class PointObject(SpaceObject):
-    def __init__(self, position: np.array, mass: float, velocity: np.array):
+    def __init__(self, position: np.array = None, mass: float = 1.0,
+                 velocity: np.array = None):
         super().__init__(position, mass)
-        self._velocity = velocity
+        if velocity is None:
+            self.velocity = np.array([0, 0])
+        else:
+            self._velocity = velocity
 
     @property
     def velocity(self) -> np.array:
