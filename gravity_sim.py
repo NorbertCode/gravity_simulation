@@ -1,5 +1,6 @@
 import argparse
 import json
+import errors
 import numpy as np
 from simulation import Simulation
 from center_object import CenterObject
@@ -26,20 +27,27 @@ if args.file:
     with open(args.file[0], "r") as file:
         sim.init_from_json(json.load(file))
 elif args.interactive:
-    center_diameter = float(input("Center object's diameters in meters: "))
-    center_mass = float(input("Center object's mass in kilograms: "))
+    try:
+        center_diameter = float(input("Center object's diameters in meters: "))
+        center_mass = float(input("Center object's mass in kilograms: "))
+    except ValueError as exc:
+        raise errors.IncorrectCenterObjectValuesError from exc
     center_obj = CenterObject(center_diameter, center_mass)
     point_objs = []
     n = int(input("Amount of point objects: "))
     for i in range(n):
-        point_pos_x = float(input(f"n={i} Point object's x position in meters: "))
-        point_pos_y = float(input(f"n={i} Point object's y position in meters: "))
+        try:
+            point_pos_x = float(input(f"n={i} Point object's x position in meters: "))
+            point_pos_y = float(input(f"n={i} Point object's y position in meters: "))
+
+            point_mass = float(input(f"n={i} Point object's mass in kilograms: "))
+
+            point_vel_x = float(input(f"n={i} Point object's x velocity in m/s: "))
+            point_vel_y = float(input(f"n={i} Point object's y velocity in m/s: "))
+        except ValueError as exc:
+            raise errors.IncorrectPointObjectValuesError from exc
+
         point_pos = np.array([point_pos_x, point_pos_y])
-
-        point_mass = float(input(f"n={i} Point object's mass in kilograms: "))
-
-        point_vel_x = float(input(f"n={i} Point object's x velocity in m/s: "))
-        point_vel_y = float(input(f"n={i} Point object's y velocity in m/s: "))
         point_vel = np.array([point_vel_x, point_vel_y])
 
         point_objs.append(PointObject(point_pos, point_mass, point_vel))
