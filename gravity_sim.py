@@ -15,6 +15,8 @@ parser.add_argument("-p", "--meters-per-pixel", type=int,
                     default=55000, help="meters per pixel")
 parser.add_argument("-s", "--save", action="store_true",
                     help="save output as files")
+parser.add_argument("-q", "--quiet", action="store_true",
+                    help="don't show output")
 input_group = parser.add_mutually_exclusive_group(required=True)
 input_group.add_argument("-f", "--file", type=str, nargs=1,
                          help="use the values from .json file")
