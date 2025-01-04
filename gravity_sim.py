@@ -2,6 +2,7 @@ import argparse
 import json
 import errors
 import numpy as np
+import data_serialization
 from simulation import Simulation
 from center_object import CenterObject
 from point_object import PointObject
@@ -24,10 +25,10 @@ input_group.add_argument("-i", "--interactive", action="store_true",
                          help="input values manually")
 args = parser.parse_args()
 
-sim = Simulation(args.resolution, args.meters_per_pixel)
+sim_objs = None
 if args.file:
     with open(args.file[0], "r") as file:
-        sim.init_from_json(json.load(file))
+        sim_objs = data_serialization.read_state_from_json(json.load(file))
 elif args.interactive:
     try:
         center_diameter = float(input("Center object's diameters in meters: "))
@@ -53,8 +54,9 @@ elif args.interactive:
         point_vel = np.array([point_vel_x, point_vel_y])
 
         point_objs.append(PointObject(point_pos, point_mass, point_vel))
-    sim.init_objects(center_obj, point_objs)
+    sim_objs = (center_obj, point_objs)
 
+sim = Simulation(args.resolution, args.meters_per_pixel, sim_objs[0], sim_objs[1])
 output = sim.run(args.k)
 output_img = sim.draw(output[0])
 output_col = sim.generate_collision_report(output[1])

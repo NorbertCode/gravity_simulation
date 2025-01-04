@@ -1,4 +1,3 @@
-import json
 import numpy as np
 from point_object import PointObject
 from center_object import CenterObject
@@ -7,51 +6,20 @@ from copy import copy
 
 
 class Simulation:
-    G_CONST = 6.67430e-11
-    TIME_STEP = 1
-
-    def __init__(self, resolution: tuple[int, int], meters_per_pixel: float):
-        """Constructor, which only sets simulation configuration.
-        Use init_objects() or init_from_json() to initialize simulation values.
-        """
+    def __init__(self, resolution: tuple[int, int], meters_per_pixel: float,
+                 center_obj: CenterObject, point_objs: list[PointObject]):
         self._resolution = resolution
         self._meters_per_pixel = meters_per_pixel
 
-        # Colors to use in simulation output
-        self._center_obj_fill_color = (255, 255, 255)
-        self._point_obj_fill_color = (0, 255, 0)
-        self._point_obj_end_color = (255, 0, 0)
-
-    def init_objects(self, center_obj: CenterObject, point_objs: list[PointObject]):
         self._center_obj = center_obj
         self._point_objs = point_objs
 
-    def init_from_json(self, data):
-        center_obj = CenterObject.from_json(data["center_object"])
-        point_objs = [
-            PointObject.from_json(obj)
-            for obj in data["point_objects"]
-        ]
-        self.init_objects(center_obj, point_objs)
+        self._G_CONST = 6.67430e-11
+        self._TIME_STEP = 1
 
-    def save_as_json(self, path: str, center_obj: CenterObject,
-                     point_objs: list[PointObject]):
-        data = {
-            "center_object": {
-                "diameter": center_obj.diameter,
-                "mass": center_obj.mass
-            },
-            "point_objects": [
-                {
-                    "velocity": obj.velocity.tolist(),
-                    "mass": obj.mass,
-                    "position": obj.position.tolist()
-                }
-                for obj in point_objs
-            ]
-        }
-        with open(path, "w") as file:
-            json.dump(data, file, indent=4)
+        self._CENTER_OBJ_FILL = (255, 255, 255)
+        self._POINT_OBJ_FILL = (0, 255, 0)
+        self._POINT_OBJ_END = (255, 0, 0)
 
     def calculate_next(self, point_obj: PointObject) -> np.array:
         """Runs the simulation for a single step for a specific PointObject.
@@ -61,12 +29,12 @@ class Simulation:
         dist = np.linalg.norm(dist_vector)
         dist_norm = dist_vector / dist
 
-        force = (self._center_obj.mass * point_obj.mass * self.G_CONST) / (dist**2)
+        force = (self._center_obj.mass * point_obj.mass * self._G_CONST) / (dist**2)
         force_vector = force * dist_norm
         accel_vector = force_vector / point_obj.mass
 
-        point_obj.update_position(self.TIME_STEP)
-        point_obj.set_velocity(point_obj.velocity + (accel_vector * self.TIME_STEP))
+        point_obj.update_position(self._TIME_STEP)
+        point_obj.set_velocity(point_obj.velocity + (accel_vector * self._TIME_STEP))
         return copy(point_obj.position)
 
     def run(self, steps: int) -> tuple[list[list[np.array]],
@@ -119,7 +87,7 @@ class Simulation:
 
         pixel_radius = round((self._center_obj.diameter / 2) / self._meters_per_pixel)
         img_center = [round(self._resolution[0] / 2), round(self._resolution[1] / 2)]
-        draw_output.circle(img_center, pixel_radius, fill=self._center_obj_fill_color)
+        draw_output.circle(img_center, pixel_radius, fill=self._CENTER_OBJ_FILL)
 
         for step in simulation_steps:
             for obj_pos in step:
@@ -128,24 +96,18 @@ class Simulation:
                     # This is because on the image it rises the lower it goes, which
                     # is the opposite of how it works in 2D geometry
                     draw_output.point(tuple(img_center + obj_pos),
-                                      self._point_obj_fill_color)
+                                      self._POINT_OBJ_FILL)
 
         for obj in self._point_objs:
             obj_pos = obj.position * np.array([1, -1])  # Invert Y axis
             pos = img_center + (obj_pos / self._meters_per_pixel).round()
-            draw_output.point(tuple(pos), self._point_obj_end_color)
+            draw_output.point(tuple(pos), self._POINT_OBJ_END)
 
         return output
-        # if file_name is not None:
-        #     output.save(f"{file_name}.png")
-        # if show_output:
-        #     output.show()
 
     @staticmethod
     def generate_collision_report(collision_data) -> str:
-        """Presents the given collision data in a readable format and
-        saves it to a file if file_name was set
-        """
+        """Presents the given collision data in a readable format"""
         output = ""
         for collision in collision_data:
             if len(collision[1]) > 1:
