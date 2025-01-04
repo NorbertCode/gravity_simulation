@@ -20,3 +20,11 @@ class SpaceObject:
     @property
     def mass(self) -> float:
         return self._mass
+
+    # Virtual methods
+    @classmethod
+    def from_json(cls, json_data: dict):
+        raise NotImplementedError()
+
+    def serialize(self) -> dict:
+        raise NotImplementedError()

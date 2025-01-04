@@ -20,3 +20,15 @@ class PointObject(SpaceObject):
 
     def update_position(self, time_step):
         self._position += self._velocity * time_step
+
+    @classmethod
+    def from_json(cls, json_data):
+        return cls(np.array(json_data["position"]), json_data["mass"],
+                   np.array(json_data["velocity"]))
+
+    def serialize(self):
+        return {
+            "velocity": self._velocity.tolist(),
+            "mass": self._mass,
+            "position": self._position.tolist()
+        }

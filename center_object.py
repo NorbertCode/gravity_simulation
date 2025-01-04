@@ -13,3 +13,13 @@ class CenterObject(SpaceObject):
     @property
     def diameter(self):
         return self._diameter
+
+    @classmethod
+    def from_json(cls, json_data: dict):
+        return cls(json_data["diameter"], json_data["mass"])
+
+    def serialize(self):
+        return {
+            "diameter": self._diameter,
+            "mass": self._mass
+        }

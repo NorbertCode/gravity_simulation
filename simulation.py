@@ -27,12 +27,9 @@ class Simulation:
         self._point_objs = point_objs
 
     def init_from_json(self, data):
-        center_obj = CenterObject(data["center_object"]["diameter"],
-                                  data["center_object"]["mass"])
+        center_obj = CenterObject.from_json(data["center_object"])
         point_objs = [
-            PointObject(np.array(obj["position"]),
-                        obj["mass"],
-                        np.array(obj["velocity"]))
+            PointObject.from_json(obj)
             for obj in data["point_objects"]
         ]
         self.init_objects(center_obj, point_objs)
