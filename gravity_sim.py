@@ -3,6 +3,7 @@ import json
 import errors
 import numpy as np
 import data_serialization
+from pathlib import Path
 from simulation import Simulation
 from center_object import CenterObject
 from point_object import PointObject
@@ -27,7 +28,7 @@ args = parser.parse_args()
 
 sim_objs = None
 if args.file:
-    with open(args.file[0], "r") as file:
+    with Path.open(args.file[0], "r") as file:
         sim_objs = data_serialization.read_state_from_json(json.load(file))
 elif args.interactive:
     try:
@@ -69,5 +70,5 @@ if args.save:
     file_name = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
     output_img.save(f"{file_name}.png")
 
-    with open(f"{file_name}.txt", "w") as file:
+    with Path.open(f"{file_name}.txt", "w") as file:
         file.write(output_col)

@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from center_object import CenterObject
 from point_object import PointObject
 
@@ -18,5 +19,5 @@ def save_state_as_json(path: str, center_obj: CenterObject,
         "center_object": center_obj.serialize(),
         "point_objects": [obj.serialize() for obj in point_objs]
     }
-    with open(path, "w") as file:
+    with Path.open(path, "w") as file:
         json.dump(data, file, indent=4)
