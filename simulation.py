@@ -1,6 +1,7 @@
 import numpy as np
 from point_object import PointObject
 from center_object import CenterObject
+from collision import Collision
 from PIL import Image, ImageDraw
 from copy import copy
 
@@ -45,20 +46,15 @@ class Simulation:
         point_obj.set_velocity(point_obj.velocity + (accel_vector * self._TIME_STEP))
         return copy(point_obj.position)
 
-    def run(self, steps: int) -> tuple[list[list[np.array]],
-                                       list[tuple[int, list[int]]]]:
+    def run(self, steps: int) -> tuple[list[list[np.array]], list[Collision]]:
         """Run the simulation with all the previously set values
         Args:
             steps: The amount of steps of the simulation to run
         Returns:
-            A tuple, where the first element is a list of positions per step.
-            So accessing the position of the third PointObject at the second step
+            A tuple, where the first element is a list of positions per step
+            and the second element is a list of Collisions
+            Accessing the position of the third PointObject at the second step
             would look like: run(10)[0][1][2]
-
-            The second element of the tuple is a collision report.
-            It's a list of all collisions, each represented by a tuple,
-            where the first element is the simulation step at which it took place
-            and the second is a list of indexes of PointObjects which collided.
         """
         sim_steps = [[(obj.position / self._meters_per_pixel).round()
                        for obj in self._point_objs]]
@@ -73,14 +69,14 @@ class Simulation:
                     if dist_to_center > self._center_obj.diameter / 2:
                         positions[index] = (pos / self._meters_per_pixel).round()
                     else:
-                        collisions.append((step, [index]))
+                        collisions.append(Collision(step, [index]))
                         blacklist.append(index)
 
             _, inverse, count = np.unique(positions, return_inverse=True,
                                           return_counts=True, axis=0)
             duplicate_indexes = np.where(count[inverse] > 1)[0]
             if len(duplicate_indexes) > 0:
-                collisions.append((step, duplicate_indexes))
+                collisions.append(Collision(step, duplicate_indexes))
             blacklist.extend(duplicate_indexes)
 
             sim_steps.append(positions)
@@ -114,16 +110,17 @@ class Simulation:
         return output
 
     @staticmethod
-    def generate_collision_report(collision_data) -> str:
+    def generate_collision_report(collision_data: list[Collision]) -> str:
         """Presents the given collision data in a readable format"""
         output = ""
         for collision in collision_data:
-            if len(collision[1]) > 1:
+            if len(collision.point_obj_indexes) > 1:
                 objects = ""
-                for obj in collision[1]:
+                for obj in collision.point_obj_indexes:
                     objects += f"n={obj}, "
-                output += f"Objects {objects[:-2]} collided at k={collision[0]}\n"
+                output += f"Objects {objects[:-2]} collided at k={collision.step}\n"
             else:
-                output += f"Object n={collision[1][0]} collided at k={collision[0]}\n"
+                index = collision.point_obj_indexes[0]
+                output += f"Object n={index} collided at k={collision.step}\n"
 
         return output
