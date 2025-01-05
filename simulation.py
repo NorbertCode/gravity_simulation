@@ -21,6 +21,14 @@ class Simulation:
         self._POINT_OBJ_FILL = (0, 255, 0)
         self._POINT_OBJ_END = (255, 0, 0)
 
+    @property
+    def center_obj(self):
+        return self._center_obj
+
+    @property
+    def point_objs(self):
+        return self._point_objs
+
     def calculate_next(self, point_obj: PointObject) -> np.array:
         """Runs the simulation for a single step for a specific PointObject.
         Modifies its position and velocity, and returns a copy of the new position.

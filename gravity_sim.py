@@ -68,7 +68,8 @@ if not args.quiet:
 
 if args.save:
     file_name = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
+    data_serialization.save_state_as_json(f"{file_name}.json", sim.center_obj,
+                                          sim.point_objs)
     output_img.save(f"{file_name}.png")
-
     with Path.open(f"{file_name}.txt", "w") as file:
         file.write(output_col)
