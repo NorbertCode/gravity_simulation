@@ -5,6 +5,7 @@ import numpy as np
 import data_serialization
 from pathlib import Path
 from simulation import Simulation
+from simulation_visualizer import SimulationVisualizer
 from center_object import CenterObject
 from point_object import PointObject
 from datetime import datetime
@@ -19,6 +20,12 @@ parser.add_argument("-s", "--save", action="store_true",
                     help="save output as files")
 parser.add_argument("-q", "--quiet", action="store_true",
                     help="don't show output")
+parser.add_argument("--center-color", type=int, nargs=3,
+                    default=[255, 255, 255], help="color of the center object")
+parser.add_argument("--step-color", type=int, nargs=3,
+                    default=[0, 255, 0], help="color of each step")
+parser.add_argument("--point-color", type=int, nargs=3,
+                    default=[255, 0, 0], help="color of end state for each point obj")
 input_group = parser.add_mutually_exclusive_group(required=True)
 input_group.add_argument("-f", "--file", type=str, nargs=1,
                          help="use the values from .json file")
@@ -27,7 +34,7 @@ input_group.add_argument("-i", "--interactive", action="store_true",
 args = parser.parse_args()
 
 sim_objs = None
-if args.file:
+if args.file is not None:
     with Path.open(args.file[0], "r") as file:
         sim_objs = data_serialization.read_state_from_json(json.load(file))
 elif args.interactive:
@@ -57,10 +64,13 @@ elif args.interactive:
         point_objs.append(PointObject(point_pos, point_mass, point_vel))
     sim_objs = (center_obj, point_objs)
 
-sim = Simulation(args.resolution, args.meters_per_pixel, sim_objs[0], sim_objs[1])
+sim = Simulation(args.meters_per_pixel, sim_objs[0], sim_objs[1])
+sim_vis = SimulationVisualizer(args.resolution, args.meters_per_pixel,
+                               tuple(args.center_color), tuple(args.step_color),
+                               tuple(args.point_color))
 output = sim.run(args.k)
-output_img = sim.draw(output[0])
-output_col = sim.generate_collision_report(output[1])
+output_img = sim_vis.draw(sim.center_obj, sim.point_objs, output[0])
+output_col = sim_vis.generate_collision_report(output[1])
 
 if not args.quiet:
     print(output_col)
