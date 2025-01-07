@@ -16,10 +16,12 @@ def input_objects() -> tuple[CenterObject, list[PointObject]]:
         try:
             center_diameter = float(input("Center object's diameters in meters: "))
             center_mass = float(input("Center object's mass in kilograms: "))
+            center_obj = CenterObject(center_diameter, center_mass)
             break
+        except (errors.NegativeDiameterError, errors.NegativeMassError) as exc:
+            print(exc)
         except ValueError:
-            print("Your input is incorrect. Please try again.")
-    center_obj = CenterObject(center_diameter, center_mass)
+            print("This value must be a number.")
 
     point_objs = []
     n = int(input("Amount of point objects: "))
@@ -29,19 +31,20 @@ def input_objects() -> tuple[CenterObject, list[PointObject]]:
                 point_pos_x = float(input(f"X position of n={i} in meters: "))
                 point_pos_y = float(input(f"Y position of n={i} in meters: "))
 
-                point_mass = float(input(f"Mass of n={i} in kilograms: "))
-
                 point_vel_x = float(input(f"X velocity of n={i} in m/s: "))
                 point_vel_y = float(input(f"Y velocity of n={i} in m/s: "))
 
+                point_mass = float(input(f"Mass of n={i} in kilograms: "))
+
+                point_pos = np.array([point_pos_x, point_pos_y])
+                point_vel = np.array([point_vel_x, point_vel_y])
+
+                point_objs.append(PointObject(point_pos, point_mass, point_vel))
                 break
+            except errors.NegativeMassError as exc:
+                print(exc)
             except ValueError:
-                print("Your input is incorrect. Please try again.")
-
-        point_pos = np.array([point_pos_x, point_pos_y])
-        point_vel = np.array([point_vel_x, point_vel_y])
-
-        point_objs.append(PointObject(point_pos, point_mass, point_vel))
+                print("This value must be a number.")
     return center_obj, point_objs
 
 
@@ -71,8 +74,13 @@ def main():
 
     sim_objs = None
     if args.file is not None:
-        with Path.open(args.file[0], "r") as file:
-            sim_objs = data_serialization.read_state_from_json(json.load(file))
+        try:
+            with Path.open(args.file[0], "r") as file:
+                sim_objs = data_serialization.read_state_from_json(json.load(file))
+        except (errors.NegativeMassError, errors.NegativeDiameterError,
+                FileNotFoundError, PermissionError) as exc:
+            print(exc)
+            exit()
     elif args.interactive:
         sim_objs = input_objects()
 
@@ -90,11 +98,15 @@ def main():
 
     if args.save:
         file_name = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
-        data_serialization.save_state_as_json(f"{file_name}.json", sim.center_obj,
-                                              sim.point_objs)
-        output_img.save(f"{file_name}.png")
-        with Path.open(f"{file_name}.txt", "w") as file:
-            file.write(output_col)
+        try:
+            data_serialization.save_state_as_json(f"{file_name}.json", sim.center_obj,
+                                                sim.point_objs)
+            output_img.save(f"{file_name}.png")
+            with Path.open(f"{file_name}.txt", "w") as file:
+                file.write(output_col)
+        except PermissionError as exc:
+            print(exc)
+            exit()
 
 
 if __name__ == "__main__":
