@@ -70,7 +70,7 @@ sim_vis = SimulationVisualizer(args.resolution, args.meters_per_pixel,
                                tuple(args.point_color))
 output = sim.run(args.k)
 output_img = sim_vis.draw(sim.center_obj, sim.point_objs, output[0])
-output_col = sim_vis.generate_collision_report(output[1])
+output_col = sim_vis.generate_report(output[1], output[0], sim.point_objs)
 
 if not args.quiet:
     print(output_col)

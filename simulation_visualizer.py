@@ -43,17 +43,23 @@ class SimulationVisualizer:
         return output
 
     @staticmethod
-    def generate_collision_report(collision_data: list[Collision]) -> str:
+    def generate_report(collision_data: list[Collision],
+                        sim_steps: list[list[np.array]],
+                        point_objs: list[PointObject]) -> str:
         """Presents the given collision data in a readable format"""
-        output = ""
-        for collision in collision_data:
-            if len(collision.point_obj_indexes) > 1:
-                objects = ""
-                for obj in collision.point_obj_indexes:
-                    objects += f"n={obj}, "
-                output += f"Objects {objects[:-2]} collided at k={collision.step}\n"
-            else:
-                index = collision.point_obj_indexes[0]
-                output += f"Object n={index} collided at k={collision.step}\n"
+        obj_output = "Objects:\n"
+        for index in range(len(sim_steps[0])):
+            start_pos = sim_steps[0][index].round(2)
+            start_pos_str = f"start position = ({start_pos[0]}, {start_pos[1]})"
+            end_pos = point_objs[index].position.round(2)
+            end_pos_str = f"end position = ({end_pos[0]}, {end_pos[1]})"
+            obj_output += f"n={index}, {start_pos_str}, {end_pos_str}\n"
 
-        return output
+        col_output = "\nCollisions:\n"
+        for collision in collision_data:
+            objects = ""
+            for obj in collision.point_obj_indexes:
+                objects += f"n={obj}, "
+            col_output += f"{objects[:-2]} at k={collision.step}\n"
+
+        return obj_output + col_output
