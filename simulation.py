@@ -50,23 +50,26 @@ class Simulation:
             Accessing the position of the third PointObject at the second step
             would look like: run(10)[0][1][2]
         """
-        sim_steps = [[(obj.position / self._meters_per_pixel).round()
-                       for obj in self._point_objs]]
+        sim_steps = [[copy(obj.position) for obj in self._point_objs]]
         collisions = []
         blacklist = []
         for step in range(steps):
+            # Positions are positions in space, which are later returned
+            # Pixel positions are only for collision detection
             positions = [np.array([np.nan, np.nan])] * len(self._point_objs)
+            pixel_positions = [np.array([np.nan, np.nan])] * len(self._point_objs)
             for index in range(len(self._point_objs)):
                 if index not in blacklist:
                     pos = self.calculate_next(self._point_objs[index])
                     dist_to_center = np.linalg.norm(self._center_obj.position - pos)
                     if dist_to_center > self._center_obj.diameter / 2:
-                        positions[index] = (pos / self._meters_per_pixel).round()
+                        positions[index] = pos
+                        pixel_positions[index] = (pos / self._meters_per_pixel).round()
                     else:
                         collisions.append(Collision(step, [index]))
                         blacklist.append(index)
 
-            _, inverse, count = np.unique(positions, return_inverse=True,
+            _, inverse, count = np.unique(pixel_positions, return_inverse=True,
                                           return_counts=True, axis=0)
             duplicate_indexes = np.where(count[inverse] > 1)[0]
             if len(duplicate_indexes) > 0:

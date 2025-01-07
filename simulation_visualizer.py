@@ -31,7 +31,8 @@ class SimulationVisualizer:
                     obj_pos[1] *= -1  # Y axis has to be inverted
                     # This is because on the image it rises the lower it goes, which
                     # is the opposite of how it works in 2D geometry
-                    draw_output.point(tuple(img_center + obj_pos),
+                    pixel_pos = (obj_pos / self._meters_per_pixel).round()
+                    draw_output.point(tuple(img_center + pixel_pos),
                                       self._point_obj_color)
 
         for obj in point_objs:
