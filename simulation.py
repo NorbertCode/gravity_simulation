@@ -40,6 +40,17 @@ class Simulation:
         point_obj.set_velocity(point_obj.velocity + (accel_vector * self._TIME_STEP))
         return copy(point_obj.position)
 
+    def check_for_center_obj_collision(self, position: np.array) -> bool:
+        dist_to_center = np.linalg.norm(self._center_obj.position - position)
+        return dist_to_center <= self._center_obj.diameter / 2
+
+    @staticmethod
+    def check_for_collisions(pixel_positions: list[np.array]) -> list[int]:
+        _, inverse, count = np.unique(pixel_positions, return_inverse=True,
+                                      return_counts=True, axis=0)
+        duplicate_indexes = np.where(count[inverse] > 1)[0]
+        return duplicate_indexes
+
     def run(self, steps: int) -> tuple[list[list[np.array]], list[Collision]]:
         """Run the simulation with all the previously set values
         Args:
@@ -61,20 +72,17 @@ class Simulation:
             for index in range(len(self._point_objs)):
                 if index not in blacklist:
                     pos = self.calculate_next(self._point_objs[index])
-                    dist_to_center = np.linalg.norm(self._center_obj.position - pos)
-                    if dist_to_center > self._center_obj.diameter / 2:
-                        positions[index] = pos
-                        pixel_positions[index] = (pos / self._meters_per_pixel).round()
-                    else:
+                    if self.check_for_center_obj_collision(pos):
                         collisions.append(Collision(step, [index]))
                         blacklist.append(index)
+                    else:
+                        positions[index] = pos
+                        pixel_positions[index] = (pos / self._meters_per_pixel).round()
 
-            _, inverse, count = np.unique(pixel_positions, return_inverse=True,
-                                          return_counts=True, axis=0)
-            duplicate_indexes = np.where(count[inverse] > 1)[0]
-            if len(duplicate_indexes) > 0:
-                collisions.append(Collision(step, duplicate_indexes))
-            blacklist.extend(duplicate_indexes)
+            indexes = self.check_for_collisions(pixel_positions)
+            if len(indexes) > 0:
+                collisions.append(Collision(step, indexes))
+            blacklist.extend(indexes)
 
             sim_steps.append(positions)
         return sim_steps, collisions
