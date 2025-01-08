@@ -1,9 +1,8 @@
 import argparse
-import json
 import errors
 import numpy as np
-import data_serialization
 from pathlib import Path
+from config_data import ConfigData
 from simulation import Simulation
 from simulation_visualizer import SimulationVisualizer
 from center_object import CenterObject
@@ -11,7 +10,19 @@ from point_object import PointObject
 from datetime import datetime
 
 
-def input_objects() -> tuple[CenterObject, list[PointObject]]:
+def input_objects() -> ConfigData:
+    steps = 0
+    resolution = []
+    meters_per_pixel = 0.0
+    while True:
+        try:
+            steps = int(input("Amount of steps (k): "))
+            resolution = int(input("X resolution: ")), int(input("Y resolution: "))
+            meters_per_pixel = float(input("Meters per pixel: "))
+            break
+        except ValueError:
+            print("This value must be a number.")
+    center_obj = None
     while True:
         try:
             center_diameter = float(input("Center object's diameters in meters: "))
@@ -24,7 +35,7 @@ def input_objects() -> tuple[CenterObject, list[PointObject]]:
             print("This value must be a number.")
 
     point_objs = []
-    n = int(input("Amount of point objects: "))
+    n = int(input("Amount of point objects (n): "))
     for i in range(n):
         while True:
             try:
@@ -45,16 +56,11 @@ def input_objects() -> tuple[CenterObject, list[PointObject]]:
                 print(exc)
             except ValueError:
                 print("This value must be a number.")
-    return center_obj, point_objs
+    return ConfigData(steps, resolution, meters_per_pixel, center_obj, point_objs)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("k", type=int, help="the amount of simulation steps")
-    parser.add_argument("-r", "--resolution", type=int, nargs=2,
-                        default=(512, 512), help="resolution of output in pixels")
-    parser.add_argument("-p", "--meters-per-pixel", type=int,
-                        default=55000, help="meters per pixel")
     parser.add_argument("-s", "--save", action="store_true",
                         help="save output as files")
     parser.add_argument("-q", "--quiet", action="store_true",
@@ -72,23 +78,27 @@ def main():
                              help="input values manually")
     args = parser.parse_args()
 
-    sim_objs = None
+    start_config_data = None
     if args.file is not None:
         try:
-            with Path.open(args.file[0], "r") as file:
-                sim_objs = data_serialization.read_state_from_json(json.load(file))
+            start_config_data = ConfigData.from_json(args.file[0])
         except (errors.NegativeMassError, errors.NegativeDiameterError,
-                FileNotFoundError, PermissionError) as exc:
+                errors.UnableToOpenConfigError, errors.InvalidStepsError,
+                errors.InvalidResolutionError, errors.InvalidMetersPerPixelError,
+                errors.InvalidCenterObjectDataError,
+                errors.InvalidPointObjectDataError) as exc:
             print(exc)
             exit()
-    elif args.interactive:
-        sim_objs = input_objects()
+    else:
+        start_config_data = ConfigData(input_objects())
 
-    sim = Simulation(args.meters_per_pixel, sim_objs[0], sim_objs[1])
-    sim_vis = SimulationVisualizer(args.resolution, args.meters_per_pixel,
+    sim_objs = start_config_data.get_simulation_objects()
+    sim = Simulation(start_config_data.meters_per_pixel, sim_objs[0], sim_objs[1])
+    sim_vis = SimulationVisualizer(start_config_data.resolution,
+                                   start_config_data.meters_per_pixel,
                                    tuple(args.center_color), tuple(args.step_color),
                                    tuple(args.point_color))
-    output = sim.run(args.k)
+    output = sim.run(start_config_data.steps)
     output_img = sim_vis.draw(sim.center_obj, sim.point_objs, output[0])
     output_col = sim_vis.generate_report(output[1], output[0], sim.point_objs)
 
@@ -99,8 +109,11 @@ def main():
     if args.save:
         file_name = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
         try:
-            data_serialization.save_state_as_json(f"{file_name}.json", sim.center_obj,
-                                                sim.point_objs)
+            end_config_data = ConfigData(start_config_data.steps,
+                                         start_config_data.resolution,
+                                         start_config_data.meters_per_pixel,
+                                         sim.center_obj, sim.point_objs)
+            end_config_data.save_data_to_json(f"{file_name}.json")
             output_img.save(f"{file_name}.png")
             with Path.open(f"{file_name}.txt", "w") as file:
                 file.write(output_col)

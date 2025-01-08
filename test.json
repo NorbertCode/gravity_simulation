@@ -1,4 +1,8 @@
 {
+    "steps": 3000,
+    "resolution_x": 512,
+    "resolution_y": 512,
+    "meters_per_pixel": 55000.0,
     "center_object": {
         "diameter": 6731000.0,
         "mass": 5.972e+24
