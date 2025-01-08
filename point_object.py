@@ -8,7 +8,7 @@ class PointObject(SpaceObject):
                  velocity: np.array = None):
         super().__init__(position, mass)
         if velocity is None:
-            self.velocity = np.array([0, 0])
+            self._velocity = np.array([0, 0]).astype(float)
         else:
             self._velocity = velocity
 
