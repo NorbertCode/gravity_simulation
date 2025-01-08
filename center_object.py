@@ -16,7 +16,11 @@ class CenterObject(SpaceObject):
 
     @classmethod
     def from_json(cls, json_data: dict):
-        return cls(json_data["diameter"], json_data["mass"])
+        diameter = json_data["diameter"]
+        mass = json_data["mass"]
+        if type(diameter) is not float or type(mass) is not float:
+            raise errors.InvalidCenterObjectDataError
+        return cls(diameter, mass)
 
     def serialize(self):
         return {

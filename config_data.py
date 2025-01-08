@@ -29,7 +29,7 @@ class ConfigData:
                 if (type(resolution[0]) is not int
                     or type(resolution[1]) is not int):
                     raise errors.InvalidResolutionError
-                if type(meters_per_pixel) is not float:
+                if not isinstance(meters_per_pixel, (int, float)):
                     raise errors.InvalidMetersPerPixelError
 
                 center_obj = CenterObject.from_json(data["center_object"])
@@ -37,7 +37,7 @@ class ConfigData:
                               for obj in data["point_objects"]]
 
                 return cls(steps, resolution, meters_per_pixel, center_obj, point_objs)
-        except (FileNotFoundError, PermissionError) as exc:
+        except (FileNotFoundError, PermissionError, json.JSONDecodeError) as exc:
             raise errors.UnableToOpenConfigError from exc
 
     @property

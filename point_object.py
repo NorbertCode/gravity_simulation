@@ -1,5 +1,6 @@
 from space_object import SpaceObject
 import numpy as np
+import errors
 
 
 class PointObject(SpaceObject):
@@ -23,8 +24,16 @@ class PointObject(SpaceObject):
 
     @classmethod
     def from_json(cls, json_data):
-        return cls(np.array(json_data["position"]), json_data["mass"],
-                   np.array(json_data["velocity"]))
+        pos = json_data["position"]
+        mass = json_data["mass"]
+        vel = json_data["velocity"]
+        if (not isinstance(pos[0], (int, float)) or not isinstance(pos[1], (int, float))
+            or not isinstance(mass, (int, float))
+            or not isinstance(vel[0], (int, float))
+            or not isinstance(vel[1], (int, float))):
+            raise errors.InvalidPointObjectDataError
+
+        return cls(np.array(pos), mass, np.array(vel))
 
     def serialize(self):
         return {
