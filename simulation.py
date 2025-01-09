@@ -50,12 +50,18 @@ class Simulation:
         dist_to_center = np.linalg.norm(self._center_obj.position - position)
         return dist_to_center <= self._center_obj.diameter / 2
 
-    @staticmethod
-    def check_for_collisions(pixel_positions: list[np.array]) -> list[int]:
+    def check_for_collisions(self, positions: list[np.array]) -> list[int]:
+        pixel_positions = []
+        for pos in positions:
+            if pos is not np.nan:
+                pixel_positions.append((pos / self._meters_per_pixel).round())
+            else:
+                pixel_positions.append(np.array([np.nan, np.nan]))
+
         _, inverse, count = np.unique(pixel_positions, return_inverse=True,
                                       return_counts=True, axis=0)
         duplicate_indexes = np.where(count[inverse] > 1)[0]
-        return duplicate_indexes
+        return duplicate_indexes.tolist()
 
     def run(self, steps: int) -> tuple[list[list[np.array]], list[Collision]]:
         """Run the simulation with all the previously set values
@@ -74,7 +80,6 @@ class Simulation:
             # Positions are positions in space, which are later returned
             # Pixel positions are only for collision detection
             positions = [np.array([np.nan, np.nan])] * len(self._point_objs)
-            pixel_positions = [np.array([np.nan, np.nan])] * len(self._point_objs)
             for index in range(len(self._point_objs)):
                 if index not in blacklist:
                     pos = self.calculate_next(self._point_objs[index])
@@ -83,9 +88,8 @@ class Simulation:
                         blacklist.append(index)
                     else:
                         positions[index] = pos
-                        pixel_positions[index] = (pos / self._meters_per_pixel).round()
 
-            indexes = self.check_for_collisions(pixel_positions)
+            indexes = self.check_for_collisions(positions)
             if len(indexes) > 0:
                 collisions.append(Collision(step, indexes))
             blacklist.extend(indexes)
