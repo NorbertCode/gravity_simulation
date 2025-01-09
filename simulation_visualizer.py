@@ -7,8 +7,9 @@ from collision import Collision
 
 class SimulationVisualizer:
     def __init__(self, resolution: list[int], meters_per_pixel: float,
-                 center_obj_color: tuple[int], point_obj_color: tuple[int],
-                 point_obj_end_color: tuple[int]):
+                 center_obj_color: tuple[int] = (255, 255, 255),
+                 point_obj_color: tuple[int] = (0, 255, 0),
+                 point_obj_end_color: tuple[int] = (255, 0, 0)):
         self._resolution = resolution
         self._meters_per_pixel = meters_per_pixel
 
