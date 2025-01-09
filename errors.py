@@ -5,7 +5,7 @@ class NegativeMassError(Exception):
 
 class NegativeDiameterError(Exception):
     def __init__(self):
-        super().__init__("Diameter cannot be negative.")
+        super().__init__("Diameter must be greater than 0.")
 
 
 class InvalidCenterObjectDataError(Exception):
