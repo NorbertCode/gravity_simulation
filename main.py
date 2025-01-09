@@ -90,7 +90,10 @@ def main():
             print(exc)
             exit()
     else:
-        start_config_data = ConfigData(input_objects())
+        user_input = input_objects()
+        start_config_data = ConfigData(user_input.steps, user_input.resolution,
+                                       user_input.meters_per_pixel,
+                                       user_input.center_obj, user_input.point_objs)
 
     sim_objs = start_config_data.get_simulation_objects()
     sim = Simulation(start_config_data.meters_per_pixel, sim_objs[0], sim_objs[1])
