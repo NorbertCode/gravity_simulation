@@ -7,7 +7,7 @@ from point_object import PointObject
 
 class ConfigData:
     def __init__(self, steps: int, resolution: list[int], meters_per_pixel: int,
-                 center_obj: CenterObject, point_objs: list[CenterObject]):
+                 center_obj: CenterObject, point_objs: list[PointObject]):
         self._steps = steps
         self._resolution = resolution
         self._meters_per_pixel = meters_per_pixel
@@ -26,7 +26,8 @@ class ConfigData:
 
                 if type(steps) is not int:
                     raise errors.InvalidStepsError
-                if (type(resolution[0]) is not int
+                if (len(resolution) != 2
+                    or type(resolution[0]) is not int
                     or type(resolution[1]) is not int):
                     raise errors.InvalidResolutionError
                 if not isinstance(meters_per_pixel, (int, float)):

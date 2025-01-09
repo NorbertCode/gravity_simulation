@@ -12,6 +12,9 @@ class PointObject(SpaceObject):
         else:
             self._velocity = velocity
 
+        if len(self._position) != 2 or len(self._velocity) != 2:
+            raise errors.InvalidPointObjectDataError
+
     @property
     def velocity(self) -> np.array:
         return self._velocity
