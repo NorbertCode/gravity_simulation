@@ -21,7 +21,7 @@ class ConfigData:
                 data = json.load(file)
 
                 steps = data["steps"]
-                resolution = [data["resolution_x"], data["resolution_y"]]
+                resolution = data["resolution"]
                 meters_per_pixel = data["meters_per_pixel"]
 
                 if type(steps) is not int:
@@ -66,8 +66,7 @@ class ConfigData:
     def save_data_to_json(self, path: str):
         data = {
             "steps": self._steps,
-            "resolution_x": self._resolution[0],
-            "resolution_y": self._resolution[1],
+            "resolution": self._resolution,
             "meters_per_pixel": self._meters_per_pixel,
             "center_object": self._center_obj.serialize(),
             "point_objects": [obj.serialize() for obj in self._point_objs]
