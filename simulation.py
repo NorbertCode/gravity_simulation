@@ -14,7 +14,7 @@ class Simulation:
         self._point_objs = point_objs
 
         self._G_CONST = 6.67430e-11
-        self._TIME_STEP = 1
+        self._TIME_STEP = 1.0
 
     @property
     def center_obj(self):
@@ -24,7 +24,7 @@ class Simulation:
     def point_objs(self):
         return self._point_objs
 
-    def calculate_next(self, point_obj: PointObject) -> np.array:
+    def calculate_acceleration(self, point_obj: PointObject) -> np.array:
         """Runs the simulation for a single step for a specific PointObject.
         Modifies its position and velocity, and returns a copy of the new position.
         """
@@ -36,8 +36,14 @@ class Simulation:
         force_vector = force * dist_norm
         accel_vector = force_vector / point_obj.mass
 
-        point_obj.update_position(self._TIME_STEP)
+        return accel_vector
+
+    def calculate_next(self, point_obj: PointObject) -> np.array:
+        accel_vector = self.calculate_acceleration(point_obj)
+
         point_obj.set_velocity(point_obj.velocity + (accel_vector * self._TIME_STEP))
+        point_obj.update_position(self._TIME_STEP)
+
         return copy(point_obj.position)
 
     def check_for_center_obj_collision(self, position: np.array) -> bool:
