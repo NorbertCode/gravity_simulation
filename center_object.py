@@ -19,7 +19,7 @@ class CenterObject(SpaceObject):
         diameter = json_data["diameter"]
         mass = json_data["mass"]
         if not isinstance(diameter, (int, float)) or not isinstance(mass, (int, float)):
-            raise errors.InvalidCenterObjectDataError(f"{type(diameter)} {type(mass)}")
+            raise errors.InvalidCenterObjectDataError
         return cls(diameter, mass)
 
     def serialize(self):
