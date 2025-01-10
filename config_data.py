@@ -6,7 +6,7 @@ from point_object import PointObject
 
 
 class ConfigData:
-    def __init__(self, steps: int, resolution: list[int], meters_per_pixel: int,
+    def __init__(self, steps: int, resolution: list[int], meters_per_pixel: float,
                  center_obj: CenterObject, point_objs: list[PointObject]):
         self._steps = steps
         self._resolution = resolution
@@ -46,7 +46,7 @@ class ConfigData:
         return self._steps
 
     @property
-    def resolution(self) -> list[int, int]:
+    def resolution(self) -> list[int]:
         return self._resolution
 
     @property
