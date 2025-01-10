@@ -125,8 +125,8 @@ def test_point_object_serialize():
 
 
 def test_point_object_verify_vector_correct():
-    assert PointObject.verify_vector(np.array([1, 2, 3.0, 5.2]))
+    assert PointObject._verify_vector(np.array([1, 2, 3.0, 5.2]))
 
 
 def test_point_object_verify_vector_incorrect():
-    assert not PointObject.verify_vector(np.array([1, 2, 3.0, "g"]))
+    assert not PointObject._verify_vector(np.array([1, 2, 3.0, "g"]))
