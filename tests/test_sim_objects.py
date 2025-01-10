@@ -84,14 +84,6 @@ def test_point_object():
     np.testing.assert_array_equal(point_obj.velocity, np.array([123, 456]))
 
 
-def test_point_object_update_position():
-    point_obj = PointObject()
-    point_obj.set_velocity(np.array([100, 200]))
-    np.testing.assert_array_equal(point_obj.velocity, np.array([100, 200]))
-    point_obj.update_position(0.5)
-    np.testing.assert_array_equal(point_obj.position, np.array([50, 100]))
-
-
 def test_point_object_from_json():
     json_data = {
         "position": [123, 456],

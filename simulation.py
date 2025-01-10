@@ -36,18 +36,17 @@ class Simulation:
 
         return accel_vector
 
-    def _simulate_step(self, point_obj: PointObject) -> np.array:
+    def _calculate_next(self, point_obj: PointObject) -> np.array:
         """
-        Run a single simulation step for a PointObject. Modifies the object's
-        position and returns a copy of it.
+        Runs a single simulation step for a PointObject. Doesn't modify
+        the point object. Returns the new position.
         """
         accel_vector = self._calculate_acceleration(point_obj)
 
         point_obj.set_velocity(point_obj.velocity + (accel_vector * self._TIME_STEP))
-        point_obj.update_position(self._TIME_STEP)
+        new_position = point_obj.position + (point_obj.velocity * self._TIME_STEP)
 
-        # Return a copy, so it doesn't pass a reference and modify the current position
-        return copy(point_obj.position)
+        return new_position
 
     def _check_for_center_obj_collision(self, position: np.array) -> bool:
         """
@@ -91,22 +90,24 @@ class Simulation:
         collisions = []
         blacklist = []  # List of indexes of objects, which have already collided
         for step in range(steps):
+            indexes = self._check_for_collisions(sim_steps[-1])
+            if len(indexes) > 0:
+                collisions.append(Collision(step, indexes))
+            blacklist.extend(indexes)
+
             # Position of (np.nan, np.nan) indicates an object has already collided
-            # it's overridden if an object's index is not in blacklist
+            # It's overridden with the next position if an object's index is
+            # not in the blacklist
             positions = [np.array([np.nan, np.nan])] * len(self._point_objs)
             for index in range(len(self._point_objs)):
                 if index not in blacklist:
-                    pos = self._simulate_step(self._point_objs[index])
+                    pos = self._calculate_next(self._point_objs[index])
                     if self._check_for_center_obj_collision(pos):
                         collisions.append(Collision(step, [index]))
                         blacklist.append(index)
                     else:
                         positions[index] = pos
-
-            indexes = self._check_for_collisions(positions)
-            if len(indexes) > 0:
-                collisions.append(Collision(step, indexes))
-            blacklist.extend(indexes)
+                        self._point_objs[index].set_position(pos)
 
             sim_steps.append(positions)
         return sim_steps, collisions

@@ -28,8 +28,8 @@ class PointObject(SpaceObject):
     def set_velocity(self, velocity: np.array):
         self._velocity = velocity
 
-    def update_position(self, time_step: float):
-        self._position += self._velocity * time_step
+    def set_position(self, position: np.array):
+        self._position = position
 
     @classmethod
     def from_json(cls, json_data):
