@@ -26,6 +26,8 @@ class Simulation:
 
     def _calculate_acceleration(self, point_obj: PointObject) -> np.array:
         """Calculate the acceleration vector (m/s) based on the current values"""
+    def _calculate_acceleration(self, point_obj: PointObject) -> np.array:
+        """Calculate the acceleration vector (m/s) based on the current values"""
         dist_vector = self._center_obj.position - point_obj.position
         dist = np.linalg.norm(dist_vector)
         dist_norm = dist_vector / dist
@@ -47,8 +49,15 @@ class Simulation:
         point_obj.update_position(self._TIME_STEP)
 
         # Return a copy, so it doesn't pass a reference and modify the current position
+        # Return a copy, so it doesn't pass a reference and modify the current position
         return copy(point_obj.position)
 
+    def _check_for_center_obj_collision(self, position: np.array) -> bool:
+        """
+        Returns true if the point object on the given position is colliding
+        with the center object - if the distance between them is smaller than the
+        center object's radius.
+        """
     def _check_for_center_obj_collision(self, position: np.array) -> bool:
         """
         Returns true if the point object on the given position is colliding
@@ -66,8 +75,18 @@ class Simulation:
         converts the space positions to positions in pixel space and
         checks for duplicates.
         """
+    def _check_for_collisions(self, positions: list[np.array]) -> list[int]:
+        """
+        Gets a list of positions of point objects and returns indexes of ones,
+        which are currently colliding.
+        Since a collision is defined as two objects on the same pixel this
+        converts the space positions to positions in pixel space and
+        checks for duplicates.
+        """
         pixel_positions = []
         for pos in positions:
+            # np.nan is used to mark a point object as already having collided before,
+            # so there is no need to run any calculations for it.
             # np.nan is used to mark a point object as already having collided before,
             # so there is no need to run any calculations for it.
             if pos is not np.nan:
@@ -90,7 +109,10 @@ class Simulation:
         sim_steps = [[copy(obj.position) for obj in self._point_objs]]
         collisions = []
         blacklist = []  # List of indexes of objects, which have already collided
+        blacklist = []  # List of indexes of objects, which have already collided
         for step in range(steps):
+            # Position of (np.nan, np.nan) indicates an object has already collided
+            # it's overridden if an object's index is not in blacklist
             # Position of (np.nan, np.nan) indicates an object has already collided
             # it's overridden if an object's index is not in blacklist
             positions = [np.array([np.nan, np.nan])] * len(self._point_objs)
