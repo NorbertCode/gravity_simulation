@@ -17,11 +17,11 @@ class Simulation:
         self._TIME_STEP = 1.0
 
     @property
-    def center_obj(self):
+    def center_obj(self) -> CenterObject:
         return self._center_obj
 
     @property
-    def point_objs(self):
+    def point_objs(self) -> list[PointObject]:
         return self._point_objs
 
     def calculate_acceleration(self, point_obj: PointObject) -> np.array:

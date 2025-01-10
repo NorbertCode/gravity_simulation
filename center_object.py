@@ -11,7 +11,7 @@ class CenterObject(SpaceObject):
         self._diameter = diameter
 
     @property
-    def diameter(self):
+    def diameter(self) -> float:
         return self._diameter
 
     @classmethod
