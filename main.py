@@ -59,6 +59,26 @@ def input_objects() -> ConfigData:
     return ConfigData(steps, resolution, meters_per_pixel, center_obj, point_objs)
 
 
+def load_config_data(args) -> ConfigData:
+    config_data = None
+    if args.file is not None:
+        try:
+            config_data = ConfigData.from_json(args.file[0])
+        except (errors.NegativeMassError, errors.NegativeDiameterError,
+                errors.UnableToOpenConfigError, errors.InvalidStepsError,
+                errors.InvalidResolutionError, errors.InvalidMetersPerPixelError,
+                errors.InvalidCenterObjectDataError,
+                errors.InvalidPointObjectDataError) as exc:
+            print(exc)
+            exit()
+    else:
+        user_input = input_objects()
+        config_data = ConfigData(user_input.steps, user_input.resolution,
+                                       user_input.meters_per_pixel,
+                                       user_input.center_obj, user_input.point_objs)
+    return config_data
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--save", action="store_true",
@@ -78,23 +98,7 @@ def main():
                              help="input values manually")
     args = parser.parse_args()
 
-    start_config_data = None
-    if args.file is not None:
-        try:
-            start_config_data = ConfigData.from_json(args.file[0])
-        except (errors.NegativeMassError, errors.NegativeDiameterError,
-                errors.UnableToOpenConfigError, errors.InvalidStepsError,
-                errors.InvalidResolutionError, errors.InvalidMetersPerPixelError,
-                errors.InvalidCenterObjectDataError,
-                errors.InvalidPointObjectDataError) as exc:
-            print(exc)
-            exit()
-    else:
-        user_input = input_objects()
-        start_config_data = ConfigData(user_input.steps, user_input.resolution,
-                                       user_input.meters_per_pixel,
-                                       user_input.center_obj, user_input.point_objs)
-
+    start_config_data = load_config_data(args)
     sim_objs = start_config_data.get_simulation_objects()
     sim = Simulation(start_config_data.meters_per_pixel, sim_objs[0], sim_objs[1])
     sim_vis = SimulationVisualizer(start_config_data.resolution,
