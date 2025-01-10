@@ -14,8 +14,32 @@ class ConfigData:
         self._center_obj = center_obj
         self._point_objs = point_objs
 
+    @property
+    def steps(self) -> int:
+        return self._steps
+
+    @property
+    def resolution(self) -> list[int]:
+        return self._resolution
+
+    @property
+    def meters_per_pixel(self) -> float:
+        return self._meters_per_pixel
+
+    @property
+    def center_obj(self) -> CenterObject:
+        return self._center_obj
+
+    @property
+    def point_objs(self) -> list[PointObject]:
+        return self._point_objs
+
+    def get_simulation_objects(self) -> tuple[CenterObject, list[PointObject]]:
+        return self._center_obj, self._point_objs
+
     @classmethod
     def from_json(cls, path: str):
+        """Create an object from the given json data"""
         try:
             with Path.open(path, "r") as file:
                 data = json.load(file)
@@ -41,30 +65,8 @@ class ConfigData:
         except (FileNotFoundError, PermissionError, json.JSONDecodeError) as exc:
             raise errors.UnableToOpenConfigError from exc
 
-    @property
-    def steps(self) -> int:
-        return self._steps
-
-    @property
-    def resolution(self) -> list[int]:
-        return self._resolution
-
-    @property
-    def meters_per_pixel(self) -> float:
-        return self._meters_per_pixel
-
-    @property
-    def center_obj(self) -> CenterObject:
-        return self._center_obj
-
-    @property
-    def point_objs(self) -> list[PointObject]:
-        return self._point_objs
-
-    def get_simulation_objects(self) -> tuple[CenterObject, list[PointObject]]:
-        return self._center_obj, self._point_objs
-
     def save_data_to_json(self, path: str):
+        """Save this object's data to a json file"""
         data = {
             "steps": self._steps,
             "resolution": self._resolution,
