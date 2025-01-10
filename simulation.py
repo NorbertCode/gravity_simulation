@@ -83,7 +83,7 @@ class Simulation:
     def run(self, steps: int) -> tuple[list[list[np.array]], list[Collision]]:
         """
         Runs the simulation for the given amount of steps.
-        Returns a tuple, wherethe first element is a list of point objects' position
+        Returns a tuple, where the first element is a list of point objects' position
         per step (for example the position of the third object at the second step
         would be run()[0][1][2]) and the second is a list of collisions, which occured.
         """
