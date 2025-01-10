@@ -122,3 +122,11 @@ def test_point_object_serialize():
         "mass": 100,
         "position": [123, 456]
     }
+
+
+def test_point_object_verify_vector_correct():
+    assert PointObject.verify_vector(np.array([1, 2, 3.0, 5.2]))
+
+
+def test_point_object_verify_vector_incorrect():
+    assert not PointObject.verify_vector(np.array([1, 2, 3.0, "g"]))

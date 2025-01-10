@@ -30,10 +30,9 @@ class PointObject(SpaceObject):
         pos = json_data["position"]
         mass = json_data["mass"]
         vel = json_data["velocity"]
-        if (not isinstance(pos[0], (int, float)) or not isinstance(pos[1], (int, float))
+        if (not PointObject.verify_vector(pos)
             or not isinstance(mass, (int, float))
-            or not isinstance(vel[0], (int, float))
-            or not isinstance(vel[1], (int, float))):
+            or not PointObject.verify_vector(vel)):
             raise errors.InvalidPointObjectDataError
 
         return cls(np.array(pos), mass, np.array(vel))
@@ -44,3 +43,7 @@ class PointObject(SpaceObject):
             "mass": self._mass,
             "position": self._position.tolist()
         }
+
+    @staticmethod
+    def verify_vector(vector: np.array):
+        return all([isinstance(element, (int, float)) for element in vector])
