@@ -8,6 +8,11 @@ class NegativeDiameterError(Exception):
         super().__init__("Diameter must be greater than 0.")
 
 
+class NegativePointObjectAmountError(Exception):
+    def __init__(self):
+        super().__init__("Amount of point objects cannot be negative.")
+
+
 class InvalidCenterObjectDataError(Exception):
     def __init__(self):
         super().__init__("Invalid center object data.")

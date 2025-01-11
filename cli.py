@@ -66,9 +66,18 @@ class CommandLineInterface:
         while True:
             try:
                 steps = int(input("Amount of steps (k): "))
+                if steps < 0:
+                    raise errors.InvalidStepsError
                 resolution = int(input("X resolution: ")), int(input("Y resolution: "))
+                if resolution[0] <= 0 or resolution[1] <= 0:
+                    raise errors.InvalidResolutionError
                 meters_per_pixel = float(input("Meters per pixel: "))
+                if meters_per_pixel <= 0:
+                    raise errors.InvalidMetersPerPixelError
                 break
+            except (errors.InvalidStepsError, errors.InvalidResolutionError,
+                    errors.InvalidMetersPerPixelError) as exc:
+                print(exc)
             except ValueError:
                 print("This value must be a number.")
 
@@ -90,7 +99,11 @@ class CommandLineInterface:
         while True:
             try:
                 n = int(input("Amount of point objects (n): "))
+                if n < 0:
+                    raise errors.NegativePointObjectAmountError
                 break
+            except errors.NegativePointObjectAmountError as exc:
+                print(exc)
             except ValueError:
                 print("This value must be an integer.")
         for i in range(n):

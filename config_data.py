@@ -48,13 +48,16 @@ class ConfigData:
                 resolution = data["resolution"]
                 meters_per_pixel = data["meters_per_pixel"]
 
-                if type(steps) is not int:
+                if type(steps) is not int or steps < 0:
                     raise errors.InvalidStepsError
                 if (len(resolution) != 2
                     or type(resolution[0]) is not int
-                    or type(resolution[1]) is not int):
+                    or type(resolution[1]) is not int
+                    or resolution[0] <= 0
+                    or resolution[1] <= 0):
                     raise errors.InvalidResolutionError
-                if not isinstance(meters_per_pixel, (int, float)):
+                if (not isinstance(meters_per_pixel, (int, float))
+                    or meters_per_pixel <= 0):
                     raise errors.InvalidMetersPerPixelError
 
                 center_obj = CenterObject.from_json(data["center_object"])
