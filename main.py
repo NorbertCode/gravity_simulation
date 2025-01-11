@@ -12,7 +12,8 @@ from datetime import datetime
 
 
 class CommandLineInterface:
-    def __init__(self, args):
+    def __init__(self, args: list[str]):
+        """Initialize the program by parsing arguments and running the simulation"""
         self._args = self._parse_args(args)
 
         # Initialize and run simulation and visualization
@@ -33,7 +34,8 @@ class CommandLineInterface:
         self._output_col = sim_vis.generate_report(self._output[1], self._output[0],
                                                    self._sim.point_objs)
 
-    def _parse_args(self, args):
+    @staticmethod
+    def _parse_args(args: list[str]) -> argparse.Namespace:
         """Parse command line arguments"""
         parser = argparse.ArgumentParser()
         parser.add_argument("-s", "--save", action="store_true",
@@ -54,6 +56,7 @@ class CommandLineInterface:
                                 help="input values manually")
         return parser.parse_args(args)
 
+    @staticmethod
     def _load_config_from_input() -> ConfigData:
         """Get configuration data from user interactive input"""
         # General output configuration - steps, resolution, meters per pixel
@@ -126,18 +129,17 @@ class CommandLineInterface:
                 print(exc)
                 exit()
         else:
-            user_input = self._load_config_from_input()
-            config_data = ConfigData(user_input.steps, user_input.resolution,
-                                        user_input.meters_per_pixel,
-                                        user_input.center_obj, user_input.point_objs)
+            config_data = self._load_config_from_input()
         return config_data
 
     def output_to_console(self):
+        """Output the simulation results to the console"""
         if not self._args.quiet:
             print(self._output_col)
             self._output_img.show()
 
     def output_to_file(self):
+        """Output the simulation results to files"""
         if self._args.save:
             file_name = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
             try:
