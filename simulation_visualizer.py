@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 from point_object import PointObject
 from center_object import CenterObject
-from collision import Collision
+from simulation_output import SimulationOutput
 
 
 class SimulationVisualizer:
@@ -55,23 +55,22 @@ class SimulationVisualizer:
         return output
 
     @staticmethod
-    def generate_report(collision_data: list[Collision],
-                        sim_steps: list[list[np.array]],
+    def generate_report(simulation_output: SimulationOutput,
                         point_objs: list[PointObject]) -> str:
         """
         Presents the given collision data in a readable format, which lists
         all objects and all collisions which occurred during the simulation.
         """
         obj_output = "Objects:\n"
-        for index in range(len(sim_steps[0])):
-            start_pos = sim_steps[0][index].round(2)
+        for index in range(len(simulation_output.simulation_steps[0])):
+            start_pos = simulation_output[0][index].round(2)
             start_pos_str = f"start position = ({start_pos[0]}, {start_pos[1]})"
             end_pos = point_objs[index].position.round(2)
             end_pos_str = f"end position = ({end_pos[0]}, {end_pos[1]})"
             obj_output += f"n={index}, {start_pos_str}, {end_pos_str}\n"
 
         col_output = "\nCollisions:\n"
-        for collision in collision_data:
+        for collision in simulation_output.collisions:
             objects = ""
             for obj in collision.point_obj_indexes:
                 objects += f"n={obj}, "

@@ -30,9 +30,8 @@ class CommandLineInterface:
                                        tuple(self._args.step_color),
                                        tuple(self._args.point_color))
         self._output_img = sim_vis.draw(self._sim.center_obj, self._sim.point_objs,
-                                        self._output[0])
-        self._output_col = sim_vis.generate_report(self._output[1], self._output[0],
-                                                   self._sim.point_objs)
+                                        self._output.simulation_steps)
+        self._output_col = sim_vis.generate_report(self._output, self._sim.point_objs)
 
     @staticmethod
     def _parse_args(args: list[str]) -> argparse.Namespace:

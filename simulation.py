@@ -1,7 +1,8 @@
 import numpy as np
 from point_object import PointObject
 from center_object import CenterObject
-from collision import Collision
+from space_event import SpaceEvent
+from simulation_output import SimulationOutput
 from copy import copy
 
 
@@ -79,7 +80,7 @@ class Simulation:
         duplicate_indexes = np.where(count[inverse] > 1)[0]
         return duplicate_indexes.tolist()
 
-    def run(self, steps: int) -> tuple[list[list[np.array]], list[Collision]]:
+    def run(self, steps: int) -> SimulationOutput:
         """
         Runs the simulation for the given amount of steps.
         Returns a tuple, where the first element is a list of point objects' position
@@ -92,7 +93,7 @@ class Simulation:
         for step in range(steps):
             indexes = self._check_for_collisions(sim_steps[-1])
             if len(indexes) > 0:
-                collisions.append(Collision(step, indexes))
+                collisions.append(SpaceEvent(step, indexes))
             blacklist.extend(indexes)
 
             # Position of (np.nan, np.nan) indicates an object has already collided
@@ -103,11 +104,11 @@ class Simulation:
                 if index not in blacklist:
                     pos = self._calculate_next(self._point_objs[index])
                     if self._check_for_center_obj_collision(pos):
-                        collisions.append(Collision(step, [index]))
+                        collisions.append(SpaceEvent(step, [index]))
                         blacklist.append(index)
                     else:
                         positions[index] = pos
                         self._point_objs[index].set_position(pos)
 
             sim_steps.append(positions)
-        return sim_steps, collisions
+        return SimulationOutput(sim_steps, collisions)

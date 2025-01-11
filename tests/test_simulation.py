@@ -74,7 +74,9 @@ def test_simulation_check_for_collisions_with_nan():
 def test_simulation_run():
     simulation = Simulation(1.0, CenterObject(10.0, 1e12),
                             [PointObject(np.array([0.0, 20.0]))])
-    sim_steps, collisions = simulation.run(20)
+    output = simulation.run(20)
+    sim_steps = output.simulation_steps
+    collisions = output.collisions
     assert len(sim_steps) == 21
     np.testing.assert_array_equal(sim_steps[0][0], np.array([0.0, 20.0]))
     np.testing.assert_array_equal(sim_steps[-1][0], np.array([np.nan, np.nan]))
