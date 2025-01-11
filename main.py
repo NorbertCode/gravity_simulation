@@ -10,7 +10,9 @@ from point_object import PointObject
 from datetime import datetime
 
 
-def input_objects() -> ConfigData:
+def load_config_from_input() -> ConfigData:
+    """Get configuration data from user interactive input"""
+    # General output configuration - steps, resolution, meters per pixel
     steps = 0
     resolution = []
     meters_per_pixel = 0.0
@@ -22,6 +24,8 @@ def input_objects() -> ConfigData:
             break
         except ValueError:
             print("This value must be a number.")
+
+    # Center object configuration
     center_obj = None
     while True:
         try:
@@ -34,6 +38,7 @@ def input_objects() -> ConfigData:
         except ValueError:
             print("This value must be a number.")
 
+    # Point objects configuration
     point_objs = []
     n = int(input("Amount of point objects (n): "))
     for i in range(n):
@@ -59,7 +64,8 @@ def input_objects() -> ConfigData:
     return ConfigData(steps, resolution, meters_per_pixel, center_obj, point_objs)
 
 
-def load_config_data(args) -> ConfigData:
+def load_config(args) -> ConfigData:
+    """Load configuration data from user input or a json file"""
     config_data = None
     if args.file is not None:
         try:
@@ -72,7 +78,7 @@ def load_config_data(args) -> ConfigData:
             print(exc)
             exit()
     else:
-        user_input = input_objects()
+        user_input = load_config_from_input()
         config_data = ConfigData(user_input.steps, user_input.resolution,
                                        user_input.meters_per_pixel,
                                        user_input.center_obj, user_input.point_objs)
@@ -80,6 +86,8 @@ def load_config_data(args) -> ConfigData:
 
 
 def main():
+    """Main function of the program - handles argument parsing and simulation output"""
+    # Argument parsing
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--save", action="store_true",
                         help="save output as files")
@@ -98,7 +106,8 @@ def main():
                              help="input values manually")
     args = parser.parse_args()
 
-    start_config_data = load_config_data(args)
+    # Initialize simulation
+    start_config_data = load_config(args)
     sim_objs = start_config_data.get_simulation_objects()
     sim = Simulation(start_config_data.meters_per_pixel, sim_objs[0], sim_objs[1])
     sim_vis = SimulationVisualizer(start_config_data.resolution,
@@ -109,10 +118,12 @@ def main():
     output_img = sim_vis.draw(sim.center_obj, sim.point_objs, output[0])
     output_col = sim_vis.generate_report(output[1], output[0], sim.point_objs)
 
+    # Output to console
     if not args.quiet:
         print(output_col)
         output_img.show()
 
+    # Save output to files
     if args.save:
         file_name = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
         try:

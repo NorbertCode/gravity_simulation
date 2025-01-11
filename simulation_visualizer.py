@@ -38,7 +38,8 @@ class SimulationVisualizer:
         for step in simulation_steps:
             for obj_pos in step:
                 if obj_pos is not np.nan:
-                    corrected_pos = obj_pos * np.array([1, -1])  # Y axis has to be inverted
+                    corrected_pos = obj_pos * np.array([1, -1])
+                    # Y axis has to be inverted
                     # This is because on the image it rises the lower it goes, which
                     # is the opposite of how it works in 2D geometry
                     pixel_pos = (corrected_pos / self._meters_per_pixel).round()
