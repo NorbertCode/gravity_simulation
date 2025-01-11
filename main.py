@@ -40,7 +40,12 @@ def load_config_from_input() -> ConfigData:
 
     # Point objects configuration
     point_objs = []
-    n = int(input("Amount of point objects (n): "))
+    while True:
+        try:
+            n = int(input("Amount of point objects (n): "))
+            break
+        except ValueError:
+            print("This value must be an integer.")
     for i in range(n):
         while True:
             try:
