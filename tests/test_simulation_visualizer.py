@@ -3,6 +3,7 @@ from simulation_visualizer import SimulationVisualizer
 from center_object import CenterObject
 from point_object import PointObject
 from space_event import SpaceEvent
+from simulation_output import SimulationOutput
 
 
 def test_simulation_visualizer_draw():
@@ -49,12 +50,12 @@ def test_simulation_visualiser_draw_negative_colors():
 
 
 def test_simulation_visualiser_generate_report_no_collisions():
-    collision_data = []
     sim_steps = [[np.array([48.0, 48.0])]]
     point_objs = [PointObject(np.array([50.0, 50.0]))]
-    report = SimulationVisualizer.generate_report(collision_data, sim_steps, point_objs)
+    sim_output = SimulationOutput(sim_steps, [], [])
+    report = SimulationVisualizer.generate_report(sim_output, point_objs)
     expected_report = ("Objects:\nn=0, start position = (48.0, 48.0), " +
-                       "end position = (50.0, 50.0)\n\nCollisions:\n")
+                       "end position = (50.0, 50.0)\n\nCollisions:\n\nClose calls:\n")
     assert report == expected_report
 
 
@@ -62,8 +63,21 @@ def test_simulation_visualiser_generate_report_collisions():
     collision_data = [SpaceEvent(1, [1, 2]), SpaceEvent(2, [3])]
     sim_steps = [[np.array([48.0, 48.0])]]
     point_objs = [PointObject(np.array([50.0, 50.0]))]
-    report = SimulationVisualizer.generate_report(collision_data, sim_steps, point_objs)
+    sim_output = SimulationOutput(sim_steps, collision_data, [])
+    report = SimulationVisualizer.generate_report(sim_output, point_objs)
     expected_report = ("Objects:\nn=0, start position = (48.0, 48.0), " +
                        "end position = (50.0, 50.0)\n\nCollisions:\nn=1, " +
-                       "n=2 at k=1\nn=3 at k=2\n")
+                       "n=2 at k=1\nn=3 at k=2\n\nClose calls:\n")
+    assert report == expected_report
+
+
+def test_simulation_visualiser_generate_report_close_calls():
+    close_calls = [SpaceEvent(1, [1, 2]), SpaceEvent(2, [3])]
+    sim_steps = [[np.array([48.0, 48.0])]]
+    point_objs = [PointObject(np.array([50.0, 50.0]))]
+    sim_output = SimulationOutput(sim_steps, [], close_calls)
+    report = SimulationVisualizer.generate_report(sim_output, point_objs)
+    expected_report = ("Objects:\nn=0, start position = (48.0, 48.0), " +
+                       "end position = (50.0, 50.0)\n\nCollisions:\n" +
+                       "\nClose calls:\nn=1, n=2 at k=1\nn=3 at k=2\n")
     assert report == expected_report

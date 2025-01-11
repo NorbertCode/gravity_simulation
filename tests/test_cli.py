@@ -7,7 +7,7 @@ from point_object import PointObject
 
 def test_load_config_from_input_valid(monkeypatch):
     inputs = iter([
-        "10", "256", "256", "100",  # General output configuration
+        "10", "256", "256", "100", "10",  # General output configuration
         "200", "1000",  # Center object configuration
         "1", "100", "100", "200", "200", "10"  # Point objects configuration
     ])
@@ -30,7 +30,7 @@ def test_load_config_from_input_valid(monkeypatch):
 def test_load_config_from_input_invalid_general(monkeypatch):
     inputs = iter([
         # General output configuration
-        "a", "10", "256", "b", "10", "256", "256", "100",
+        "a", "10", "256", "b", "10", "256", "256", "100", "10",
         "200", "1000",  # Center object configuration
         "1", "100", "100", "200", "200", "10"  # Point objects configuration
     ])
@@ -52,7 +52,7 @@ def test_load_config_from_input_invalid_general(monkeypatch):
 
 def test_load_config_from_input_invalid_center_obj(monkeypatch):
     inputs = iter([
-        "10", "256", "256", "100",  # General output configuration
+        "10", "256", "256", "100", "10",  # General output configuration
         "200", "a", "200", "1000",  # Center object configuration
         "1", "100", "100", "200", "200", "10"  # Point objects configuration
     ])
@@ -74,7 +74,7 @@ def test_load_config_from_input_invalid_center_obj(monkeypatch):
 
 def test_load_config_from_input_invalid_point_obj_amount(monkeypatch):
     inputs = iter([
-        "10", "256", "256", "100",  # General output configuration
+        "10", "256", "256", "100", "10",  # General output configuration
         "200", "1000",  # Center object configuration
         "a", "3.5", "1", "100", "100", "200", "200", "10"  # Point objects configuration
     ])
@@ -96,7 +96,7 @@ def test_load_config_from_input_invalid_point_obj_amount(monkeypatch):
 
 def test_load_config_from_input_invalid_point_obj(monkeypatch):
     inputs = iter([
-        "10", "256", "256", "100",  # General output configuration
+        "10", "256", "256", "100", "10",  # General output configuration
         "200", "1000",  # Center object configuration
         # Point objects configuration
         "1", "100", "a", "100", "100",

@@ -13,6 +13,7 @@ def valid_sim_config():
         "steps": 100,
         "resolution": [128, 128],
         "meters_per_pixel": 1,
+        "close_call_distance": 1,
         "center_object": {
             "diameter": 1,
             "mass": 1
@@ -33,6 +34,7 @@ def invalid_steps_sim_config():
         "steps": "1",
         "resolution": [128, 128],
         "meters_per_pixel": 1,
+        "close_call_distance": 1,
         "center_object": {
             "diameter": 1,
             "mass": 1
@@ -53,6 +55,7 @@ def invalid_resolution_sim_config():
         "steps": 1,
         "resolution": [128, "128"],
         "meters_per_pixel": 1,
+        "close_call_distance": 1,
         "center_object": {
             "diameter": 1,
             "mass": 1
@@ -73,6 +76,28 @@ def invalid_meters_per_pixel_sim_config():
         "steps": 1,
         "resolution": [128, 128],
         "meters_per_pixel": "1",
+        "close_call_distance": 1,
+        "center_object": {
+            "diameter": 1,
+            "mass": 1
+        },
+        "point_objects": [
+            {
+                "velocity": [0, 0],
+                "mass": 1,
+                "position": [0, 0]
+            }
+        ]
+    }
+
+
+@pytest.fixture
+def invalid_close_call_sim_config():
+    return {
+        "steps": 100,
+        "resolution": [128, 128],
+        "meters_per_pixel": 1,
+        "close_call_distance": -1,
         "center_object": {
             "diameter": 1,
             "mass": 1
@@ -136,9 +161,19 @@ def test_from_json_no_file():
         ConfigData.from_json("non_existent_file.json")
 
 
+def test_from_json_invalid_close_call_distance(tmp_path, invalid_close_call_sim_config):
+    config_file = tmp_path / "config.json"
+    with config_file.open("w") as file:
+        json.dump(invalid_close_call_sim_config, file)
+
+    with pytest.raises(errors.InvalidCloseCallDistanceError):
+        ConfigData.from_json(str(config_file))
+
+
 def test_save_data_to_json(tmp_path, valid_sim_config):
     saved_config = ConfigData(valid_sim_config["steps"], valid_sim_config["resolution"],
                         valid_sim_config["meters_per_pixel"],
+                        valid_sim_config["close_call_distance"],
                         CenterObject.from_json(valid_sim_config["center_object"]),
                         [PointObject.from_json(valid_sim_config["point_objects"][0])])
 
