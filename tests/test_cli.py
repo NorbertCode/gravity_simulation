@@ -29,7 +29,8 @@ def test_load_config_from_input_valid(monkeypatch):
 
 def test_load_config_from_input_invalid_general(monkeypatch):
     inputs = iter([
-        "a", "10", "256", "b", "10", "256", "256", "100",  # General output configuration
+        # General output configuration
+        "a", "10", "256", "b", "10", "256", "256", "100",
         "200", "1000",  # Center object configuration
         "1", "100", "100", "200", "200", "10"  # Point objects configuration
     ])
