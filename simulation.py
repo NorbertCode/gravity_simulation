@@ -7,9 +7,10 @@ from copy import copy
 
 
 class Simulation:
-    def __init__(self, meters_per_pixel: float, center_obj: CenterObject,
-                 point_objs: list[PointObject]):
+    def __init__(self, meters_per_pixel: float, close_call_distance: float,
+                 center_obj: CenterObject, point_objs: list[PointObject]):
         self._meters_per_pixel = meters_per_pixel
+        self._close_call_distance = close_call_distance
 
         self._center_obj = center_obj
         self._point_objs = point_objs
@@ -80,6 +81,17 @@ class Simulation:
         duplicate_indexes = np.where(count[inverse] > 1)[0]
         return duplicate_indexes.tolist()
 
+    def _check_for_close_calls(self, point_obj: PointObject) -> list[int]:
+        """
+        Returns a list of indexes of point objects, which are within close call distance
+        """
+        close_call_indexes = []
+        for index, obj in enumerate(self._point_objs):
+            dist = np.linalg.norm(obj.position - point_obj.position)
+            if dist <= self._close_call_distance and obj != point_obj:
+                close_call_indexes.append(index)
+        return close_call_indexes
+
     def run(self, steps: int) -> SimulationOutput:
         """
         Runs the simulation for the given amount of steps.
@@ -89,6 +101,7 @@ class Simulation:
         """
         sim_steps = [[copy(obj.position) for obj in self._point_objs]]
         collisions = []
+        close_calls = []
         blacklist = []  # List of indexes of objects, which have already collided
         for step in range(steps):
             indexes = self._check_for_collisions(sim_steps[-1])
@@ -102,6 +115,13 @@ class Simulation:
             positions = [np.array([np.nan, np.nan])] * len(self._point_objs)
             for index in range(len(self._point_objs)):
                 if index not in blacklist:
+                    cc_for_obj = self._check_for_close_calls(self._point_objs[index])
+                    if len(cc_for_obj) > 0:
+                        cc_for_obj.append(index)
+                        cc_for_obj.sort()
+                        cc_event = SpaceEvent(step, sorted(cc_for_obj))
+                        if cc_event not in close_calls:
+                            close_calls.append(cc_event)
                     pos = self._calculate_next(self._point_objs[index])
                     if self._check_for_center_obj_collision(pos):
                         collisions.append(SpaceEvent(step, [index]))
@@ -111,4 +131,4 @@ class Simulation:
                         self._point_objs[index].set_position(pos)
 
             sim_steps.append(positions)
-        return SimulationOutput(sim_steps, collisions)
+        return SimulationOutput(sim_steps, collisions, close_calls)

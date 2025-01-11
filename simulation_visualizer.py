@@ -63,7 +63,7 @@ class SimulationVisualizer:
         """
         obj_output = "Objects:\n"
         for index in range(len(simulation_output.simulation_steps[0])):
-            start_pos = simulation_output[0][index].round(2)
+            start_pos = simulation_output.simulation_steps[0][index].round(2)
             start_pos_str = f"start position = ({start_pos[0]}, {start_pos[1]})"
             end_pos = point_objs[index].position.round(2)
             end_pos_str = f"end position = ({end_pos[0]}, {end_pos[1]})"
@@ -76,4 +76,11 @@ class SimulationVisualizer:
                 objects += f"n={obj}, "
             col_output += f"{objects[:-2]} at k={collision.step}\n"
 
-        return obj_output + col_output
+        cc_output = "\nClose calls:\n"
+        for close_call in simulation_output.close_calls:
+            objects = ""
+            for obj in close_call.point_obj_indexes:
+                objects += f"n={obj}, "
+            cc_output += f"{objects[:-2]} at k={close_call.step}\n"
+
+        return obj_output + col_output + cc_output

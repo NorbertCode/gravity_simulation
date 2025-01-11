@@ -21,6 +21,7 @@ class CommandLineInterface:
         sim_objs = self._start_config_data.get_simulation_objects()
 
         self._sim = Simulation(self._start_config_data.meters_per_pixel,
+                               self._start_config_data.close_call_distance,
                                sim_objs[0], sim_objs[1])
         self._output = self._sim.run(self._start_config_data.steps)
 
@@ -62,6 +63,7 @@ class CommandLineInterface:
         steps = 0
         resolution = []
         meters_per_pixel = 0.0
+        close_call_distance = 0.0
         while True:
             try:
                 steps = int(input("Amount of steps (k): "))
@@ -73,9 +75,13 @@ class CommandLineInterface:
                 meters_per_pixel = float(input("Meters per pixel: "))
                 if meters_per_pixel <= 0:
                     raise errors.InvalidMetersPerPixelError
+                close_call_distance = float(input("Close call distance in meters: "))
+                if close_call_distance <= 0:
+                    raise errors.InvalidCloseCallDistanceError
                 break
             except (errors.InvalidStepsError, errors.InvalidResolutionError,
-                    errors.InvalidMetersPerPixelError) as exc:
+                    errors.InvalidMetersPerPixelError,
+                    errors.InvalidCloseCallDistanceError) as exc:
                 print(exc)
             except ValueError:
                 print("This value must be a number.")
@@ -125,7 +131,8 @@ class CommandLineInterface:
                     print(exc)
                 except ValueError:
                     print("This value must be a number.")
-        return ConfigData(steps, resolution, meters_per_pixel, center_obj, point_objs)
+        return ConfigData(steps, resolution, meters_per_pixel, close_call_distance,
+                          center_obj, point_objs)
 
     def _load_config(self, args) -> ConfigData:
         """Load configuration data from user input or a json file"""
@@ -137,7 +144,8 @@ class CommandLineInterface:
                     errors.UnableToOpenConfigError, errors.InvalidStepsError,
                     errors.InvalidResolutionError, errors.InvalidMetersPerPixelError,
                     errors.InvalidCenterObjectDataError,
-                    errors.InvalidPointObjectDataError) as exc:
+                    errors.InvalidPointObjectDataError,
+                    errors.InvalidCloseCallDistanceError) as exc:
                 print(exc)
                 exit()
         else:

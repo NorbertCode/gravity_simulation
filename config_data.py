@@ -7,10 +7,12 @@ from point_object import PointObject
 
 class ConfigData:
     def __init__(self, steps: int, resolution: list[int], meters_per_pixel: float,
-                 center_obj: CenterObject, point_objs: list[PointObject]):
+                 close_call_distance: float, center_obj: CenterObject,
+                 point_objs: list[PointObject]):
         self._steps = steps
         self._resolution = resolution
         self._meters_per_pixel = meters_per_pixel
+        self._close_call_distance = close_call_distance
         self._center_obj = center_obj
         self._point_objs = point_objs
 
@@ -25,6 +27,10 @@ class ConfigData:
     @property
     def meters_per_pixel(self) -> float:
         return self._meters_per_pixel
+
+    @property
+    def close_call_distance(self) -> float:
+        return self._close_call_distance
 
     @property
     def center_obj(self) -> CenterObject:
@@ -47,6 +53,7 @@ class ConfigData:
                 steps = data["steps"]
                 resolution = data["resolution"]
                 meters_per_pixel = data["meters_per_pixel"]
+                close_call_distance = data["close_call_distance"]
 
                 if type(steps) is not int or steps < 0:
                     raise errors.InvalidStepsError
@@ -59,12 +66,16 @@ class ConfigData:
                 if (not isinstance(meters_per_pixel, (int, float))
                     or meters_per_pixel <= 0):
                     raise errors.InvalidMetersPerPixelError
+                if (not isinstance(close_call_distance, (int, float))
+                    or close_call_distance <= 0):
+                    raise errors.InvalidCloseCallDistanceError
 
                 center_obj = CenterObject.from_json(data["center_object"])
                 point_objs = [PointObject.from_json(obj)
                               for obj in data["point_objects"]]
 
-                return cls(steps, resolution, meters_per_pixel, center_obj, point_objs)
+                return cls(steps, resolution, meters_per_pixel, close_call_distance,
+                           center_obj, point_objs)
         except (FileNotFoundError, PermissionError, json.JSONDecodeError) as exc:
             raise errors.UnableToOpenConfigError from exc
 
@@ -74,6 +85,7 @@ class ConfigData:
             "steps": self._steps,
             "resolution": self._resolution,
             "meters_per_pixel": self._meters_per_pixel,
+            "close_call_distance": self._close_call_distance,
             "center_object": self._center_obj.serialize(),
             "point_objects": [obj.serialize() for obj in self._point_objs]
         }

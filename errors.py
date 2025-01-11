@@ -41,3 +41,8 @@ class InvalidResolutionError(Exception):
 class InvalidMetersPerPixelError(Exception):
     def __init__(self):
         super().__init__("Invalid meters per pixel value.")
+
+
+class InvalidCloseCallDistanceError(Exception):
+    def __init__(self):
+        super().__init__("Invalid close call distance value.")

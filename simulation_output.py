@@ -7,4 +7,5 @@ from space_event import SpaceEvent
 class SimulationOutput:
     # List of positions for each point object in each step
     simulation_steps: list[list[np.array]]
-    collisions = list[SpaceEvent]
+    collisions: list[SpaceEvent]
+    close_calls: list[SpaceEvent]
