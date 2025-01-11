@@ -2,7 +2,7 @@ import numpy as np
 from simulation_visualizer import SimulationVisualizer
 from center_object import CenterObject
 from point_object import PointObject
-from collision import Collision
+from space_event import SpaceEvent
 
 
 def test_simulation_visualizer_draw():
@@ -59,7 +59,7 @@ def test_simulation_visualiser_generate_report_no_collisions():
 
 
 def test_simulation_visualiser_generate_report_collisions():
-    collision_data = [Collision(1, [1, 2]), Collision(2, [3])]
+    collision_data = [SpaceEvent(1, [1, 2]), SpaceEvent(2, [3])]
     sim_steps = [[np.array([48.0, 48.0])]]
     point_objs = [PointObject(np.array([50.0, 50.0]))]
     report = SimulationVisualizer.generate_report(collision_data, sim_steps, point_objs)
