@@ -24,14 +24,14 @@ Program przyjmuje dane na temat obiektu centralnego, n liczby obiektów punktowy
 
 Do uruchomienia wykorzystywany jest interfejs wiersza poleceń. Program pozwala na wprowadzenie danych ręcznie przez tryb interaktywny lub przy użyciu pliku JSON. Umożliwia również wprowadzenie dodatkowych argumentów zmieniających wyprowadzony wynik, np. zmieniając kolorystykę. Więcej na ten temat w sekcji [Instrukcja](#instrukcja).
 
-Po przekazaniu przez użytkownika danych program symuluje ruch każdego obiektu punktowego przez podaną ilość kroków oraz wykrywa kolizje zarówno z obiektem centralnym, jak i między sobą. Tworzy też raport o niebezpiecznych zbliżeniach, wymieniający obiekty, które w danym kroku znalazły się w niebezpiecznie bliskiej odległości.
+Po przekazaniu przez użytkownika danych, program symuluje ruch każdego obiektu punktowego przez podaną ilość kroków oraz wykrywa kolizje zarówno z obiektem centralnym, jak i między sobą. Tworzy też raport o niebezpiecznych zbliżeniach, wymieniający obiekty, które w danym kroku znalazły się w niebezpiecznie bliskiej odległości.
 
 Wynik domyślnie jest wyświetlany po ukończeniu symulacji, jednak istnieje również opcja zapisuje do pliku. Dodanie argumentu zapisującego symulację powoduje wytworzenie trzech plików:
 - Obraz w formacie .png, przedstawiający ślady ruchu obiektów.
 - Raport zdarzeń w formacie .txt, zawierający:
     - Spis obiektów punktowych, wraz z ich pozycjami startowymi i końcowymi.
-    - Raport o kolizjach, wypisujących jakie obiekty zderzyły się ze sobą w jakim kroku.
-    - Raport o niebezpiecznych zbliżenia, wypisujący obiekty, które zbliżyły się do siebie na odległość mniejszą lub równą podanej w konfiguracji.
+    - Raport o kolizjach, wypisujący jakie obiekty zderzyły się ze sobą w jakim kroku.
+    - Raport o niebezpiecznych zbliżeniach, wypisujący obiekty, które zbliżyły się do siebie na odległość mniejszą lub równą podanej w konfiguracji.
 - Plik konfiguracyjny w formacie .json, który zawiera informacje ze stanu końcowego. Może zostać jako plik konfiguracyjny dla następnego wywołania, aby kontynuować symulacje.
 
 ## Struktura
@@ -48,7 +48,7 @@ Drugi z dostępnych typów obiektów kosmicznych. Główny element symulacji - r
 Prosta klasa, reprezentująca zdarzenie w przestrzeni. Zawiera krok, w którym coś się zdarzyło oraz indeksy obiektów punktowych, które brały udział. Wykorzystywana do reprezentacji kolizji i niebezpiecznych zbliżeń.
 
 ### Simulation
-Kluczowy element programu. Zajmuje się wszystkimi obliczeniami i analizą danych. Dla każdego elementu punktowego wylicza jego prędkość i aplikuje ją przez interfejs PointObject. Dla każdego kroku sprawdza wystąpienie kolizji oraz niebezpiecznych zbliżeń.
+Kluczowy element programu. Zajmuje się wszystkimi obliczeniami i analizą danych. Dla każdego elementu punktowego wylicza jego prędkość i aplikuje ją przez interfejs [PointObject](#pointobject). Dla każdego kroku sprawdza wystąpienie kolizji oraz niebezpiecznych zbliżeń.
 
 ### SimulationOutput
 Prosta klasa, służąca jedynie za strukturę danych, która jest zwracana jako wynik symulacji.
@@ -71,7 +71,7 @@ Aby wystartować program należy uruchomić plik `cli.py` z argumentem określaj
 ### Opcjonalne argumenty
 - `-s`, `--save` - Zapis danych wyjściowych symulacji (tj. obraz w formacie .png, raport w formacie .txt oraz plik konfiguracyjny ze stanem końcowym w formacie .json)
 - `-q`, `--quiet` - Program uruchomiony z tym argumentem nie wyświetla swoich wyników. Przeznaczony do użytku razem z `-s`, aby natychmiastowo zapisać symulacje, bez wyświetlania jej.
-- `--center-color R G B` - Kolor obiektu centralnego w obrazku końcowym. R, G i B muszą być liczbami całkowitymi (z dowolnego zakresu, jednak są później ściskane do <0, 255>) oznaczającymi kolejno wartość koloru czerwonego, zielonego i niebieskiego.
+- `--center-color R G B` - Kolor obiektu centralnego w obrazku końcowym. R, G i B muszą być liczbami całkowitymi (z dowolnego zakresu, są później ściskane do <0, 255>) oznaczającymi kolejno wartość koloru czerwonego, zielonego i niebieskiego.
 - `--step-color R G B` - Działa identycznie jak powyższy argument, zmienia jednak kolor śladów ruchu.
 - `--point-color R G B` - Działa identycznie jak powyższy argument, zmienia jednak kolor pozycji końcowych obiektów punktowych
 
@@ -80,14 +80,14 @@ Plik konfiguracyjny musi być plikiem w formacie .json i zawierać następujące
 - steps - Całkowitoliczbowa ilość kroków symulacji.
 - resolution - Rozdzielczość obrazka końcowego, przedstawiona jako lista dwóch liczb całkowitych.
 - meters_per_pixel - Ilość metrów jaką reprezentuje pojedynczy piksel. Wartość liczbowa.
-- close_call_distance - Dystans w metrach, jaki definiuje niebezpieczne zbliżenie. Gdy obiekty zbliżą się do siebie na mniejszą odległość jest to wypisane w raporcie końcowym.
+- close_call_distance - Dystans w metrach, jaki definiuje niebezpieczne zbliżenie. Gdy obiekty zbliżą się do siebie na mniejszą odległość, jest to wypisane w raporcie końcowym.
 - center_object - Obiekt zawierający następujące dane:
     - diameter - Średnica obiektu centralnego. Wartość liczbowa > 0
     - mass - Masa obiektu centralnego. Wartość liczbowa >= 0
 - point_objects - Lista obiektów, z których każdy musi zawierać:
     - velocity - Wektor prędkości danego obiektu punktowego. Lista dwóch wartości liczbowych.
     - mass - Masa danego obiektu punktowego. Wartość liczbowa >= 0
-    - position - Wektor oznaczający pozycję danego obiektu punktowego. Listaw dwóch wartości liczbowych.
+    - position - Wektor oznaczający pozycję danego obiektu punktowego. Lista dwóch wartości liczbowych.
 
 Warto również wspomnieć, że obiekt centralny zawsze znajduje się na pozycji (0, 0), więc pozycję obiektów punktowych należy do tego dostosować. Tzn. aby obiekt punktowy zaczynał "pod" obiektem centralnym jego pozycja w osi Y musi być mniejsza od 0.
 
@@ -123,7 +123,7 @@ Poniższy plik konfiguracyjny wygeneruje obraz przedstawiający pół obrotu ma�
 ```
 
 ## Refleksja
-Podsumowując, udało mi się wykonać prosty program, który symuluje ruch obiektów wokół danego ciała centralnego w pewnym przybliżeniu. Dokładność symulacji teoretycznie można zmieniać edytując zmienną Simulation._time_step, jednak zdecydowałem się nie pozwalać na to użytkownikom.
+Podsumowując, udało mi się wykonać prosty program, który w pewnym przybliżeniu symuluje ruch obiektów wokół danego ciała centralnego . Dokładność symulacji teoretycznie można zmieniać edytując zmienną Simulation._time_step, jednak zdecydowałem się nie pozwalać na to użytkownikom.
 
 Planowałem zapewnić więcej funkcjonalności przez argumenty przekazywane wierszem poleceń. Między innymi miał istnieć kolejny tryb wprowadzania danych, bezpośrednio wywołując komendę i podając wartości jako argumenty. Nie powstał jednak przez pewne ograniczenia biblioteki argparse co do zagnieżdżania grup argumentów oraz ponieważ uznałem go za dużo mniej wygodny w użyciu niż już istniejące tryby.
 
