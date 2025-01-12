@@ -32,20 +32,20 @@ Wynik domyślnie jest wyświetlany po ukończeniu symulacji, jednak istnieje ró
     - Spis obiektów punktowych, wraz z ich pozycjami startowymi i końcowymi.
     - Raport o kolizjach, wypisujący jakie obiekty zderzyły się ze sobą w jakim kroku.
     - Raport o niebezpiecznych zbliżeniach, wypisujący obiekty, które zbliżyły się do siebie na odległość mniejszą lub równą podanej w konfiguracji.
-- Plik konfiguracyjny w formacie .json, który zawiera informacje ze stanu końcowego. Może zostać jako plik konfiguracyjny dla następnego wywołania, aby kontynuować symulacje.
+- Plik konfiguracyjny w formacie .json, który zawiera informacje ze stanu końcowego. Może zostać użyty jako plik konfiguracyjny dla następnego wywołania, aby kontynuować symulacje.
 
 ## Struktura
 ### SpaceObject
 Klasa bazowa dla pozostałych dwóch typów obiektów kosmicznych. Posiada jedynie własności wspólne jak pozycja i masa, a także metody wirtualne do konwersji z lub na JSON.
 
 ### CenterObject
-Jeden z dwóch dostępnych typów obiektów kosmicznych. Jest cały czas stacjonarny, więc nie pozwala na ustawienie pozycji. Jest ona na sztywno ustawiona na punkt (0, 0). Zawiera jednak średnicę.
+Dziedziczy po [SpaceObject](#spaceobject). Jeden z dwóch dostępnych typów obiektów kosmicznych. Jest cały czas stacjonarny, więc nie pozwala na ustawienie pozycji. Jest ona na sztywno ustawiona na punkt (0, 0). Zawiera jednak średnicę.
 
 ### PointObject
-Drugi z dostępnych typów obiektów kosmicznych. Główny element symulacji - ruchy jego instancji są obliczane i wyświetlane jako wynik symulacji.
+Dziedziczy po [SpaceObject](#spaceobject). Drugi z dostępnych typów obiektów kosmicznych. Główny element symulacji - ruchy jego instancji są obliczane i wyświetlane jako wynik symulacji.
 
 ### SpaceEvent
-Prosta klasa, reprezentująca zdarzenie w przestrzeni. Zawiera krok, w którym coś się zdarzyło oraz indeksy obiektów punktowych, które brały udział. Wykorzystywana do reprezentacji kolizji i niebezpiecznych zbliżeń.
+Prosta klasa reprezentująca zdarzenie w przestrzeni. Zawiera krok, w którym coś się zdarzyło oraz indeksy obiektów punktowych, które brały udział. Wykorzystywana do reprezentacji kolizji i niebezpiecznych zbliżeń.
 
 ### Simulation
 Kluczowy element programu. Zajmuje się wszystkimi obliczeniami i analizą danych. Dla każdego elementu punktowego wylicza jego prędkość i aplikuje ją przez interfejs [PointObject](#pointobject). Dla każdego kroku sprawdza wystąpienie kolizji oraz niebezpiecznych zbliżeń.
@@ -67,6 +67,8 @@ Pozwala na interakcję użytkownika z programem. Zapewnia możliwość wprowadze
 Aby wystartować program należy uruchomić plik `cli.py` z argumentem określającym źródło danych. Dostępne opcje to:
 - `-i` - Tryb interaktywny. Prosi użytkownika kolejno o wszystkie dane niezbędne do uruchomienia symulacji.
 - `-f NAZWA_PLIKU` - Odczyt z pliku. Plik musi być w formacie .json i zawierać odpowiednie informacje.
+
+Przykłady wywołania: `python3 cli.py -i`, `python3 cli.py -sq -f config.json`
 
 ### Opcjonalne argumenty
 - `-s`, `--save` - Zapis danych wyjściowych symulacji (tj. obraz w formacie .png, raport w formacie .txt oraz plik konfiguracyjny ze stanem końcowym w formacie .json)
