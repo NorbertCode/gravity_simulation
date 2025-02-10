@@ -117,7 +117,7 @@ def test_from_json_valid(tmp_path, valid_sim_config):
     with config_file.open("w") as file:
         json.dump(valid_sim_config, file, indent=4)
 
-    config = ConfigData.from_json(str(config_file))
+    config = ConfigData.from_json(config_file)
     assert config.steps == 100
     np.testing.assert_array_equal(config.resolution, [128, 128])
     assert config.meters_per_pixel == 1
@@ -134,7 +134,7 @@ def test_from_json_invalid_steps(tmp_path, invalid_steps_sim_config):
         json.dump(invalid_steps_sim_config, file)
 
     with pytest.raises(errors.InvalidStepsError):
-        ConfigData.from_json(str(config_file))
+        ConfigData.from_json(config_file)
 
 
 def test_from_json_invalid_resolution(tmp_path, invalid_resolution_sim_config):
@@ -143,7 +143,7 @@ def test_from_json_invalid_resolution(tmp_path, invalid_resolution_sim_config):
         json.dump(invalid_resolution_sim_config, file)
 
     with pytest.raises(errors.InvalidResolutionError):
-        ConfigData.from_json(str(config_file))
+        ConfigData.from_json(config_file)
 
 
 def test_from_json_invalid_meter_per_pixel(tmp_path,
@@ -153,12 +153,12 @@ def test_from_json_invalid_meter_per_pixel(tmp_path,
         json.dump(invalid_meters_per_pixel_sim_config, file)
 
     with pytest.raises(errors.InvalidMetersPerPixelError):
-        ConfigData.from_json(str(config_file))
+        ConfigData.from_json(config_file)
 
 
-def test_from_json_no_file():
+def test_from_json_no_file(tmp_path):
     with pytest.raises(errors.UnableToOpenConfigError):
-        ConfigData.from_json("non_existent_file.json")
+        ConfigData.from_json(tmp_path / "non_existent_file.json")
 
 
 def test_from_json_invalid_close_call_distance(tmp_path, invalid_close_call_sim_config):
@@ -167,7 +167,7 @@ def test_from_json_invalid_close_call_distance(tmp_path, invalid_close_call_sim_
         json.dump(invalid_close_call_sim_config, file)
 
     with pytest.raises(errors.InvalidCloseCallDistanceError):
-        ConfigData.from_json(str(config_file))
+        ConfigData.from_json(config_file)
 
 
 def test_save_data_to_json(tmp_path, valid_sim_config):
@@ -178,9 +178,9 @@ def test_save_data_to_json(tmp_path, valid_sim_config):
                         [PointObject.from_json(valid_sim_config["point_objects"][0])])
 
     config_file = tmp_path / "config.json"
-    saved_config.save_data_to_json(str(config_file))
+    saved_config.save_data_to_json(config_file)
 
-    loaded_config = ConfigData.from_json(str(config_file))
+    loaded_config = ConfigData.from_json(config_file)
 
     assert saved_config.steps == loaded_config.steps
     assert saved_config.resolution == loaded_config.resolution

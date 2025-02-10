@@ -44,10 +44,10 @@ class ConfigData:
         return self._center_obj, self._point_objs
 
     @classmethod
-    def from_json(cls, path: str):
+    def from_json(cls, path: Path):
         """Create an object from the given json data"""
         try:
-            with Path.open(path, "r") as file:
+            with path.open("r") as file:
                 data = json.load(file)
 
                 steps = data["steps"]
@@ -79,7 +79,7 @@ class ConfigData:
         except (FileNotFoundError, PermissionError, json.JSONDecodeError) as exc:
             raise errors.UnableToOpenConfigError from exc
 
-    def save_data_to_json(self, path: str):
+    def save_data_to_json(self, path: Path):
         """Save this object's data to a json file"""
         data = {
             "steps": self._steps,
@@ -89,5 +89,5 @@ class ConfigData:
             "center_object": self._center_obj.serialize(),
             "point_objects": [obj.serialize() for obj in self._point_objs]
         }
-        with Path.open(path, "w") as file:
+        with path.open("w") as file:
             json.dump(data, file, indent=4)

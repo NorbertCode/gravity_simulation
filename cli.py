@@ -139,7 +139,7 @@ class CommandLineInterface:
         config_data = None
         if self._args.file is not None:
             try:
-                config_data = ConfigData.from_json(args.file[0])
+                config_data = ConfigData.from_json(Path(args.file[0]))
             except (errors.NegativeMassError, errors.NegativeDiameterError,
                     errors.UnableToOpenConfigError, errors.InvalidStepsError,
                     errors.InvalidResolutionError, errors.InvalidMetersPerPixelError,
@@ -168,7 +168,7 @@ class CommandLineInterface:
                                              self._start_config_data.meters_per_pixel,
                                              self._start_config_data.close_call_distance,
                                              self._sim.center_obj, self._sim.point_objs)
-                end_config_data.save_data_to_json(f"{file_name}.json")
+                end_config_data.save_data_to_json(Path(f"{file_name}.json"))
                 self._output_img.save(f"{file_name}.png")
                 with Path.open(f"{file_name}.txt", "w") as file:
                     file.write(self._output_col)
