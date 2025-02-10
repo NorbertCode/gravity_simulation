@@ -166,6 +166,7 @@ class CommandLineInterface:
                 end_config_data = ConfigData(self._start_config_data.steps,
                                              self._start_config_data.resolution,
                                              self._start_config_data.meters_per_pixel,
+                                             self._start_config_data.close_call_distance,
                                              self._sim.center_obj, self._sim.point_objs)
                 end_config_data.save_data_to_json(f"{file_name}.json")
                 self._output_img.save(f"{file_name}.png")
